@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OCI Voice Trainer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ... (Rest of your existing styles) ... */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #F7F3F0; color: #1C1410; min-height: 100vh; }
+    :root {
+      --red:#C74634; --red-dark:#9B2D1F; --red-deep:#6B1A10;
+      --red-light:#F9EDEB; --red-mid:#E5B5AD;
+      --bg:#F7F3F0; --bg-deep:#EDE6E0; --surface:#FFFFFF;
+      --border:#DDD0C8; --border-md:#C8B8B0;
+      --text:#1C1410; --text-md:#5A4438; --text-mut:#9A8070;
+      --gold:#C8900A; --gold-bg:#FDF6E3; --gold-bdr:#E8CC80;
+      --serif:'Source Serif 4', Georgia, serif;
+    }
+
+    @keyframes fadeUp  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    @keyframes ripple  { 0%{transform:scale(.8);opacity:.9} 100%{transform:scale(2.4);opacity:0} }
+    @keyframes pulse   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+    @keyframes bounce  { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+
+    /* NAV */
+    nav { background:var(--surface); border-bottom:2px solid var(--red); height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; box-shadow:0 2px 8px rgba(199,70,52,.08); position:sticky; top:0; z-index:100; }
+    .logo { display:flex; align-items:center; gap:12px; }
+    .logo-o   { width:36px; height:36px; background:var(--red); border-radius:6px 0 0 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:var(--serif); font-style:italic; font-weight:700; font-size:16px; }
+    .logo-dot { width:36px; height:36px; background:var(--red-dark); border-radius:0 6px 6px 0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.4); font-size:10px; }
+    .logo-text { border-left:1px solid var(--border); padding-left:12px; }
+    .logo-title { font-family:var(--serif); font-weight:700; font-size:14px; }
+    .logo-sub   { font-size:10px; color:var(--text-mut); margin-top:2px; }
+
+    /* BUTTONS */
+    .btn { padding:10px 24px; border-radius:5px; font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all .13s; }
+    .btn-red   { background:var(--red); color:#fff; }
+    .btn-red:hover { background:var(--red-dark); }
+    .btn-red:disabled { background:var(--bg-deep); color:var(--text-mut); cursor:not-allowed; }
+    .btn-ghost { background:var(--surface); border:1px solid var(--border); color:var(--text-md); }
+    .btn-ghost:hover { border-color:var(--red-mid); color:var(--red); }
+    .btn-sm { padding:5px 14px; font-size:12px; border-radius:4px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-md); transition:all .13s; }
+    .btn-sm:hover { background:var(--red-light); border-color:var(--red-mid); color:var(--red); }
+    .ftab { padding:4px 13px; font-size:12px; border-radius:3px; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-md); transition:all .13s; }
+    .ftab:hover { border-color:var(--red-mid); color:var(--red); }
+    .ftab.on { background:var(--red); border-color:var(--red); color:#fff; }
+    .mode-btn { flex:1; border:1px solid var(--border); background:none; cursor:pointer; border-radius:4px; padding:6px 8px; font-size:11px; color:var(--text-md); transition:all .13s; }
+    .mode-btn:hover { border-color:var(--red-mid); color:var(--red); }
+    .mode-btn.on { background:var(--red); border-color:var(--red); color:#fff; }
+
+    /* SECTION HEADER */
+    .sh { font-size:11px; font-weight:700; letter-spacing:2px; color:var(--text-mut); text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .sh::before { content:''; width:3px; height:14px; background:var(--red); border-radius:2px; flex-shrink:0; }
+    .sh::after  { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* HERO */
+    .hero { background:linear-gradient(135deg,var(--red-deep) 0%,var(--red) 55%,#D4604A 100%); border-radius:0 0 14px 14px; padding:38px 44px 34px; margin-bottom:40px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(255,255,255,.07); }
+    .hero::after  { content:''; position:absolute; top:20px; right:60px; width:130px; height:130px; border-radius:50%; border:1px solid rgba(255,255,255,.05); }
+    .hero-inner { position:relative; z-index:1; max-width:560px; }
+    .hero-eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+    .hero-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.5); }
+    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; color:rgba(255,255,255,.65); text-transform:uppercase; }
+    .hero h1 { font-family:var(--serif); font-size:clamp(22px,3.5vw,36px); font-weight:700; color:#fff; margin-bottom:12px; line-height:1.2; }
+    .hero p  { font-size:14px; line-height:1.8; color:rgba(255,255,255,.85); }
+
+    /* HOW IT WORKS */
+    .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:40px; }
+    .how-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; position:relative; overflow:hidden; }
+    .how-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:8px 8px 0 0; }
+    .how-num { font-family:var(--serif); font-weight:700; font-size:18px; color:var(--red); opacity:.2; }
+
+    /* PERSONA GRID */
+    .pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-bottom:28px; }
+    .pcard { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; transition:all .15s; position:relative; overflow:hidden; }
+    .pcard:hover { border-color:var(--red-mid); box-shadow:0 4px 18px rgba(199,70,52,.12); transform:translateY(-1px); }
+    .pcard.sel { border-color:var(--red); box-shadow:0 0 0 3px var(--red-light); }
+    .pcard-stripe { display:none; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:10px 10px 0 0; }
+    .pcard.sel .pcard-stripe { display:block; }
+    .pcard-check { display:none; position:absolute; top:12px; right:12px; width:20px; height:20px; border-radius:50%; background:var(--red); align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; }
+    .pcard.sel .pcard-check { display:flex; }
+
+    /* AVATAR */
+    .av { border-radius:8px; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; color:var(--red); flex-shrink:0; }
+    .av-lg { width:44px; height:44px; font-size:13px; }
+    .av-md { width:60px; height:60px; font-size:18px; border-radius:12px; }
+    .av-sm { width:28px; height:28px; font-size:9px; border-radius:6px; }
+    .diff { font-size:10px; padding:2px 9px; border-radius:3px; font-weight:600; }
+    .easy   { background:#fdf6ee; color:#7a4a10; border:1px solid #e0b870; }
+    .medium { background:#fef3f1; color:#7a2a10; border:1px solid #dba090; }
+    .hard   { background:#f9eeee; color:#7a1a1a; border:1px solid #cc8080; }
+
+    /* PAGES */
+    .page { display:none; }
+    .page.active { display:block; }
+    #session-page { display:none; height:100vh; flex-direction:column; overflow:hidden; }
+    #session-page.active { display:flex; }
+
+    /* SESSION */
+    #snav  { height:48px; background:var(--surface); border-bottom:2px solid var(--red); display:flex; align-items:center; justify-content:space-between; padding:0 18px; flex-shrink:0; }
+    #sbody { flex:1; display:flex; overflow:hidden; }
+    #sidebar { width:196px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:12px; gap:10px; }
+    #ppanel { flex:1; background:#F2EBE6; border-radius:8px; border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; position:relative; overflow:hidden; }
+    #ppanel::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:8px 8px 0 0; }
+    .stag { position:absolute; top:10px; left:10px; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:2px 6px; font-size:8px; color:var(--text-mut); font-weight:700; letter-spacing:.5px; }
+    #mpanel { background:var(--bg-deep); border-radius:7px; padding:10px; border:1px solid var(--border); }
+    #chat   { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    #msgs   { flex:1; overflow-y:auto; padding:22px 24px; display:flex; flex-direction:column; gap:14px; background:var(--bg); }
+    #ibar   { border-top:1px solid var(--border); padding:14px 18px 16px; background:var(--surface); flex-shrink:0; }
+
+    /* BUBBLES */
+    .mrow { display:flex; gap:8px; align-items:flex-end; animation:fadeUp .2s ease; }
+    .mrow.u { flex-direction:row-reverse; }
+    .bbl { max-width:70%; padding:11px 15px; font-size:14px; line-height:1.65; }
+    .bbl.b { background:var(--surface); border:1px solid var(--border); border-radius:14px 14px 14px 4px; color:var(--text-md); box-shadow:0 1px 4px rgba(0,0,0,.05); }
+    .bbl.u { background:var(--red); color:#fff; border-radius:14px 14px 4px 14px; }
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--border-md); animation:bounce 1.2s infinite; }
+    .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+
+    /* MIC */
+    #micbtn { width:64px; height:64px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; transition:all .15s; position:relative; flex-shrink:0; }
+    #micbtn.idle { background:var(--red-light); color:var(--red); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    #micbtn.live { background:var(--red); color:#fff; box-shadow:0 0 0 4px var(--red-light); animation:pulse 1.5s infinite; }
+    #micbtn.busy { background:var(--bg-deep); color:var(--text-mut); cursor:not-allowed; }
+    .mring { display:none; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--red); animation:ripple 1s ease-out infinite; pointer-events:none; }
+    #micbtn.live .mring { display:block; }
+    .sring  { display:none; position:absolute; border-radius:50%; border:2px solid var(--red-mid); animation:ripple 1.2s ease-out infinite; }
+    .sring2 { display:none; position:absolute; border-radius:50%; border:2px solid var(--red); opacity:.4; animation:ripple 1.2s ease-out infinite .3s; }
+
+    /* MISC */
+    #livetx { display:none; width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:9px 13px; font-size:13px; color:var(--text-md); min-height:36px; margin-bottom:10px; }
+    #micerr { display:none; margin-top:8px; font-size:10px; color:var(--gold); background:var(--gold-bg); border:1px solid var(--gold-bdr); border-radius:4px; padding:5px 8px; line-height:1.5; }
+    #timer  { font-family:var(--serif); font-weight:700; font-size:14px; color:var(--text-mut); min-width:44px; text-align:right; }
+    .empty  { margin:auto; text-align:center; color:var(--text-mut); line-height:1.8; padding:40px 20px; }
+    .emav   { width:56px; height:56px; border-radius:50%; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; font-size:16px; color:var(--red); margin:0 auto 14px; }
+
+    /* DEBRIEF */
+    .trow { display:flex; gap:10px; align-items:flex-start; }
+    .tlabel { font-size:10px; font-weight:600; color:var(--text-mut); margin-bottom:4px; letter-spacing:.3px; text-transform:uppercase; }
+    .tbbl  { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--text-md); line-height:1.65; }
+
+    /* CUSTOM PERSONA MODAL */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(28,20,16,.45); z-index:200; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--surface); border-radius:12px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.18); animation:fadeUp .2s ease; }
+    .modal-head { padding:22px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--surface); z-index:1; }
+    .modal-head h3 { font-family:var(--serif); font-weight:700; font-size:18px; }
+    .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-mut); line-height:1; padding:4px 8px; border-radius:4px; }
+    .modal-close:hover { background:var(--bg-deep); color:var(--text); }
+    .modal-body { padding:20px 24px 24px; }
+    .fgroup { margin-bottom:16px; }
+    .fgroup label { display:block; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--text-mut); text-transform:uppercase; margin-bottom:6px; }
+    .fgroup input, .fgroup textarea, .fgroup select {
+      width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:5px;
+      font-family:inherit; font-size:13px; color:var(--text); background:var(--bg);
+      outline:none; transition:border-color .13s;
+    }
+    .fgroup input:focus, .fgroup textarea:focus, .fgroup select:focus { border-color:var(--red); }
+    .fgroup textarea { resize:vertical; min-height:90px; line-height:1.6; }
+    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .modal-foot { display:flex; gap:10px; justify-content:flex-end; padding-top:4px; }
+
+    /* CUSTOM PERSONA CARD */
+    .pcard-add { border-style:dashed; border-color:var(--border-md); background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-height:170px; }
+    .pcard-add:hover { border-color:var(--red); background:var(--red-light); }
+    .pcard-add .add-icon { width:42px; height:42px; border-radius:50%; background:var(--red-light); border:2px dashed var(--red-mid); display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .13s; }
+    .pcard-add:hover .add-icon { background:var(--red); border-style:solid; }
+    .pcard-add:hover .add-icon span { filter:brightness(10); }
+    .pcard-custom { position:relative; }
+    .pcard-del { display:none; position:absolute; top:8px; right:8px; background:none; border:1px solid var(--border); border-radius:4px; font-size:11px; padding:2px 7px; cursor:pointer; color:var(--text-mut); z-index:2; }
+    .pcard-custom:hover .pcard-del { display:block; }
+    .pcard-del:hover { background:var(--red-light); border-color:var(--red-mid); color:var(--red); }
+
+    /* COACH FEEDBACK STYLES */
+    #coach-section { margin-top: 32px; animation: fadeUp .5s ease; display: none; }
+    .coach-card { 
+      background: #FFF9E6; border: 1px solid #E8CC80; border-radius: 12px; 
+      padding: 24px; position: relative; overflow: hidden;
+    }
+    .coach-card::before { 
+      content: 'COACH EVALUATION'; position: absolute; top: 0; left: 0; 
+      background: var(--gold); color: #fff; font-size: 9px; font-weight: 800; 
+      padding: 4px 12px; border-radius: 0 0 8px 0; letter-spacing: 1px;
+    }
+    .coach-text { 
+      font-size: 14px; line-height: 1.7; color: #5C4B20; white-space: pre-wrap; 
+    }
+    #coach-loading { 
+      text-align: center; padding: 20px; color: var(--text-mut); font-size: 13px; 
+      font-style: italic; display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="lobby" class="page active">
+    <nav>
+    <div class="logo">
+      <div style="display:flex"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
+      <div class="logo-text">
+        <div class="logo-title">OCI Voice Trainer</div>
+        <div class="logo-sub">Oracle Cloud Engineer Practice Tool</div>
+      </div>
+    </div>
+  </nav>
+
+  <div style="max-width:980px;margin:0 auto;padding:0 20px 48px">
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow"><div class="hero-dot"></div><span class="hero-label">Oracle Cloud · Practice Suite</span></div>
+        <h1>OCI Customer Voice<br>Roleplay Trainer</h1>
+        <p>Practice handling real OCI sales and support scenarios with AI-powered customer personas — a skeptical CTO, frustrated client, or cost-obsessed procurement manager. Get comfortable with tough conversations before they happen live.</p>
+      </div>
+    </div>
+
+    <div class="sh">How It Works</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">⚡</span><span class="how-num">00</span></div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Start the backend</div>
+        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Run <code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:2px">python launcher.py</code> in your terminal. It uses your <code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:2px">~/.oci/config</code> — no API key needed.</div>
+      </div>
+      <div class="how-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">🎭</span><span class="how-num">01</span></div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Choose a persona</div>
+        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Each customer has a distinct personality, challenge level, and OCI-specific concerns.</div>
+      </div>
+      <div class="how-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">🎙️</span><span class="how-num">02</span></div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Speak or type</div>
+        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Use your mic to respond as you would on a real call. The AI customer replies in real time via OCI Generative AI.</div>
+      </div>
+      <div class="how-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">📋</span><span class="how-num">03</span></div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Review transcript</div>
+        <div style="font-size:12px;color:var(--text-md);line-height:1.65">After ending the session, review the full conversation to identify where you lost the customer.</div>
+      </div>
+    </div>
+
+    <div class="sh">Select Your Customer</div>
+    <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:var(--text-mut);font-weight:600;margin-right:4px">Difficulty:</span>
+      <button class="ftab on" data-f="All">All</button>
+      <button class="ftab" data-f="Easy">Easy</button>
+      <button class="ftab" data-f="Medium">Medium</button>
+      <button class="ftab" data-f="Hard">Hard</button>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <button class="btn btn-red" id="start-btn" disabled>Select a customer to begin</button>
+      <span id="sel-lbl" style="font-size:13px;color:var(--text-md);display:none"></span>
+    </div>
+  </div>
+</div>
+
+<div id="session-page" class="page">
+    <div id="snav">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="display:flex;transform:scale(.72);transform-origin:left center"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
+      <div id="sn-av"    class="av av-sm" style="margin-left:2px"></div>
+      <span id="sn-name" style="font-size:13px;font-weight:600"></span>
+      <span id="sn-lbl"  style="font-size:12px;color:var(--text-mut)"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="timer">00:00</span>
+      <button class="btn-sm" id="end-btn">End session</button>
+    </div>
+  </div>
+
+  <div id="sbody">
+    <div id="sidebar">
+      <div id="ppanel">
+        <div class="stag">CUSTOMER</div>
+        <div style="position:relative;margin:8px 0 12px">
+          <div class="sring"  id="sr1" style="inset:-10px"></div>
+          <div class="sring2" id="sr2" style="inset:-5px"></div>
+          <div id="sp-av" class="av av-md"></div>
+        </div>
+        <div id="sp-name"    style="font-weight:700;font-size:12px;text-align:center;color:var(--text);margin-bottom:2px"></div>
+        <div id="sp-lbl"     style="font-size:10px;color:var(--text-md);text-align:center;margin-bottom:2px"></div>
+        <div id="sp-diff"    class="diff" style="margin-bottom:12px"></div>
+        <div id="sp-dots" style="display:none;gap:4px;background:var(--surface);padding:6px 12px;border-radius:14px;border:1px solid var(--border)">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+      <div id="mpanel">
+        <div style="font-size:9px;font-weight:700;color:var(--text-mut);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Input Mode</div>
+        <div style="display:flex;gap:5px">
+          <button class="mode-btn on" id="btn-voice">🎙️ Voice</button>
+          <button class="mode-btn"    id="btn-text">⌨️ Text</button>
+        </div>
+        <div id="micerr">Mic unavailable — switch to text mode.</div>
+      </div>
+    </div>
+
+    <div id="chat">
+      <div id="msgs"></div>
+      <div id="ibar">
+        <div id="vinput" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+          <div id="livetx"></div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <button id="micbtn" class="idle"><div class="mring"></div>🎙️</button>
+            <div id="micstat" style="font-size:13px;color:var(--text-mut);line-height:1.5;max-width:260px">Press the mic to speak your response.</div>
+          </div>
+        </div>
+        <div id="tinput" style="display:none;gap:9px;align-items:flex-end">
+          <textarea id="txt" rows="2" placeholder="Type your response… Enter to send · Shift+Enter for new line"
+            style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:14px;outline:none;resize:none;padding:10px 13px;border-radius:5px;line-height:1.55;transition:border-color .13s;width:100%"></textarea>
+          <button id="send-btn" class="btn btn-red" style="height:58px;padding:0 20px;flex-shrink:0" disabled>Send →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="debrief" class="page">
+  <nav>
+    <div class="logo">
+      <div style="display:flex"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
+      <div class="logo-text">
+        <div class="logo-title">OCI Voice Trainer</div>
+        <div class="logo-sub">Oracle Cloud Engineer Practice Tool</div>
+      </div>
+    </div>
+    <span id="dtime" style="font-size:12px;color:var(--text-mut)"></span>
+  </nav>
+  <div style="max-width:720px;margin:0 auto;padding:40px 20px;animation:fadeUp .35s ease">
+    
+    <div style="margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border)">
+      <div class="sh" style="margin-bottom:10px">Session Complete</div>
+      <h2 style="font-family:var(--serif);font-size:32px;font-weight:700;margin-bottom:8px">Call Transcript</h2>
+      <p id="dmeta" style="font-size:13px;color:var(--text-md)"></p>
+    </div>
+
+    <div id="transcript" style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px"></div>
+
+    <div id="coach-loading">✨ Consulting with OCI Coach...</div>
+    <div id="coach-section">
+      <div class="sh" style="margin-bottom:10px">Performance Coaching</div>
+      <div class="coach-card">
+        <div id="coach-content" class="coach-text"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:40px">
+      <button class="btn btn-ghost" id="new-btn">← Choose new customer</button>
+      <button class="btn btn-red"   id="restart-btn">↺ Restart session</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM PERSONA MODAL -->
+<div class="modal-overlay" id="persona-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Create Custom Persona</h3>
+      <button class="modal-close" id="modal-close-btn" title="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow2">
+        <div class="fgroup">
+          <label>First Name *</label>
+          <input type="text" id="cp-name" placeholder="e.g. Jordan" maxlength="30"/>
+        </div>
+        <div class="fgroup">
+          <label>Role / Title *</label>
+          <input type="text" id="cp-label" placeholder="e.g. VP of IT" maxlength="50"/>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Persona Description *</label>
+        <textarea id="cp-desc" placeholder="Describe this customer's personality, goals, concerns, and attitude. The more detail you add, the more realistic the roleplay.&#10;&#10;e.g. A cautious IT director at a healthcare company. Concerned about HIPAA compliance and data residency. Has been burned by a failed AWS migration and is highly skeptical of cloud vendors."></textarea>
+      </div>
+      <div class="fgroup">
+        <label>Difficulty</label>
+        <select id="cp-difficulty">
+          <option value="Easy">Easy</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+      </div>
+      <div id="cp-err" style="display:none;background:var(--red-light);border:1px solid var(--red-mid);color:var(--red-dark);border-radius:5px;padding:8px 12px;font-size:12px;margin-bottom:8px"></div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-red"   id="modal-save-btn">Add Persona →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ... (Your existing PERSONAS, config, and state) ...
+const BACKEND  = "/chat";
+const TTS_RATE = 1.1;
+
+const PERSONAS = [
+  { id:"1", name:"Alex",  label:"Skeptical CTO",          
+    avatar:"AX", difficulty:"Hard",
+    desc:"A skeptical CTO at a mid-sized fintech company. Concerned about cloud costs, vendor lock-in, and security." },
+  { id:"2", name:"Maria", label:"Eager VP of Engineering",  
+    avatar:"MR", difficulty:"Easy",
+    desc:"A VP of Engineering at a retail company. Enthusiastic but lacks deep technical knowledge." },
+  { id:"3", name:"James", label:"Procurement Manager",      
+    avatar:"JM", difficulty:"Medium",
+    desc:"A procurement manager evaluating OCI against Azure and GCP purely on cost and SLA terms." },
+  { id:"4", name:"Sara",  label:"Unhappy OCI Customer",     
+    avatar:"SR", difficulty:"Hard",
+    desc:"An existing OCI customer frustrated with a recent outage. Starts conversations irritably." },
+];
+
+const sysPrompt = desc => `
+You are roleplaying as a customer in a practice scenario for an Oracle Cloud Engineer.
+Persona: ${desc}
+Rules:
+- Stay in character. Respond realistically.
+- Keep responses to 2–4 sentences.
+- Do not volunteer info; make the engineer work for it.
+`.trim();
+
+let selected = null, active = null;
+let history  = [];   
+let log      = [];   
+let elapsed  = 0, timerID = null;
+let isListening = false, isSpeaking = false, isLoading = false;
+let mode = "voice", filter = "All", recog = null;
+
+const g   = id => document.getElementById(id);
+const fmt = s  => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const dc  = d  => d.toLowerCase();
+
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  g(id).classList.add("active");
+}
+
+function micState(s) { 
+  const b = g("micbtn");
+  b.className = s;
+  b.innerHTML = `<div class="mring"></div>${s==="live" ? "⏹" : "🎙️"}`;
+  b.disabled  = s === "busy";
+}
+
+function setSpeaking(on) {
+  isSpeaking = on;
+  g("sr1").style.display = g("sr2").style.display = on ? "block" : "none";
+  g("sp-dots").style.display = on ? "flex" : "none";
+  g("sp-av").style.borderColor = on ? "var(--red)" : "var(--red-mid)";
+  updateStat();
+  micState(isLoading||on ? "busy" : isListening ? "live" : "idle");
+}
+
+function updateStat() {
+  const el = g("micstat");
+  if (isListening)     el.innerHTML = `<strong style="color:var(--red)">Listening…</strong> Click stop when done.`;
+  else if (isLoading)  el.textContent = "Processing…";
+  else if (isSpeaking) el.textContent = `${active.name} is speaking…`;
+  else                 el.textContent = "Press the mic to speak your response.";
+}
+
+// ── Custom Personas (persisted in localStorage) ──────────────────
+const CUSTOM_KEY = "oci_custom_personas";
+
+function loadCustomPersonas() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); }
+  catch { return []; }
+}
+
+function saveCustomPersonas(list) {
+  localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
+}
+
+function allPersonas() {
+  return [...PERSONAS, ...loadCustomPersonas()];
+}
+
+function renderGrid() {
+  const grid = g("pgrid");
+  grid.innerHTML = "";
+  const list = filter === "All" ? allPersonas() : allPersonas().filter(p => p.difficulty === filter);
+
+  list.forEach(p => {
+    const sel = selected?.id === p.id;
+    const isCustom = !!p.custom;
+    const c = document.createElement("div");
+    c.className = `pcard${sel?" sel":""}${isCustom?" pcard-custom":""}`;
+    c.innerHTML = `
+      <div class="pcard-stripe"></div>
+      <div class="pcard-check">✓</div>
+      ${isCustom ? `<button class="pcard-del" title="Delete persona">✕ Remove</button>` : ""}
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px">
+        <div class="av av-lg" style="${isCustom?"background:var(--bg-deep);border-color:var(--border-md)":""}">${p.avatar}</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">${p.name}</div>
+          <div style="font-size:11px;color:var(--text-md);margin-top:1px">${p.label}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-md);line-height:1.6;margin-bottom:13px">${p.desc}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bg-deep);padding-top:10px">
+        <span style="font-size:9px;color:var(--text-mut);font-weight:600;letter-spacing:.3px">${isCustom?"CUSTOM":""}</span>
+        <span class="diff ${dc(p.difficulty)}">${p.difficulty}</span>
+      </div>`;
+    // Delete button (stop propagation so it doesn't select)
+    if (isCustom) {
+      c.querySelector(".pcard-del").onclick = e => { e.stopPropagation(); deleteCustomPersona(p.id); };
+    }
+    c.onclick = () => pickPersona(p);
+    grid.appendChild(c);
+  });
+
+  // Always append the "Add Custom" card at the end
+  const add = document.createElement("div");
+  add.className = "pcard pcard-add";
+  add.title = "Create a custom customer persona";
+  add.innerHTML = `
+    <div class="add-icon"><span>＋</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-md)">Add Custom Persona</div>
+    <div style="font-size:11px;color:var(--text-mut);text-align:center;line-height:1.5;max-width:160px">Design your own customer with a custom scenario</div>`;
+  add.onclick = openModal;
+  grid.appendChild(add);
+}
+
+function deleteCustomPersona(id) {
+  const list = loadCustomPersonas().filter(p => p.id !== id);
+  saveCustomPersonas(list);
+  if (selected?.id === id) {
+    selected = null;
+    g("start-btn").disabled = true;
+    g("start-btn").textContent = "Select a customer to begin";
+    g("sel-lbl").style.display = "none";
+  }
+  renderGrid();
+}
+
+// ── Custom Persona Modal ──────────────────────────────────────────
+function openModal() {
+  ["cp-name","cp-label","cp-desc"].forEach(id => g(id).value = "");
+  g("cp-difficulty").value = "Medium";
+  g("cp-err").style.display = "none";
+  g("persona-modal").classList.add("open");
+  setTimeout(() => g("cp-name").focus(), 80);
+}
+
+function closeModal() {
+  g("persona-modal").classList.remove("open");
+}
+
+function saveCustomPersona() {
+  const name  = g("cp-name").value.trim();
+  const label = g("cp-label").value.trim();
+  const desc  = g("cp-desc").value.trim();
+  const err   = g("cp-err");
+
+  if (!name || !label || !desc) {
+    err.textContent = "Please fill in Name, Role, and Description.";
+    err.style.display = "block"; return;
+  }
+  err.style.display = "none";
+
+  const initials = name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2) ||
+                   name.slice(0,2).toUpperCase();
+  const id = "custom_" + Date.now();
+  const persona = {
+    id, name, label,
+    avatar:     initials,
+    difficulty: g("cp-difficulty").value,
+    desc,
+    custom:     true
+  };
+
+  const list = loadCustomPersonas();
+  list.push(persona);
+  saveCustomPersonas(list);
+  closeModal();
+  renderGrid();
+  // Auto-select the newly created persona
+  pickPersona(persona);
+}
+
+function pickPersona(p) {
+  selected = p; renderGrid();
+  g("start-btn").disabled = false;
+  g("start-btn").textContent = `Start session with ${p.name} →`;
+  const lbl = g("sel-lbl");
+  lbl.style.display = "inline";
+}
+
+function startSession() {
+  active = selected;
+  history = [
+    { role:"USER",      text: sysPrompt(active.desc) },
+    { role:"ASSISTANT", text: "Ready." }
+  ];
+  log = []; elapsed = 0;
+  isListening = isSpeaking = isLoading = false;
+
+  g("sn-av").textContent      = active.avatar;
+  g("sn-name").textContent    = active.name;
+  g("sn-lbl").textContent     = `· ${active.label}`;
+  g("sp-av").textContent      = active.avatar;
+  g("sp-name").textContent    = active.name;
+  g("sp-lbl").textContent     = active.label;
+  const db = g("sp-diff");
+  db.className = `diff ${dc(active.difficulty)}`; db.textContent = active.difficulty;
+
+  setSpeaking(false); micState("idle"); setMode("voice");
+
+  g("msgs").innerHTML = `
+    <div class="empty">
+      <div class="emav">${active.avatar}</div>
+      <strong style="color:var(--text);font-size:14px">${active.name}</strong> is on the line.<br>
+      <span style="font-size:12px" id="ehint">Press the mic button and speak your opening.</span>
+    </div>`;
+
+  clearInterval(timerID);
+  g("timer").textContent = "00:00";
+  timerID = setInterval(() => { elapsed++; g("timer").textContent = fmt(elapsed); }, 1000);
+  showPage("session-page");
+}
+
+function addMsg(role, text) {
+  document.querySelector(".empty")?.remove();
+  const msgs = g("msgs");
+  const row = document.createElement("div");
+  row.className = `mrow${role==="user"?" u":""}`;
+  if (role==="bot") {
+    const av = document.createElement("div");
+    av.className="av av-sm"; av.textContent=active.avatar;
+    row.appendChild(av);
+  }
+  const b = document.createElement("div");
+  b.className = `bbl ${role==="user"?"u":"b"}`; b.textContent = text;
+  row.appendChild(b);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  g("typing")?.remove();
+  const msgs = g("msgs");
+  const r = document.createElement("div");
+  r.id="typing"; r.className="mrow";
+  r.innerHTML=`<div class="av av-sm">${active.avatar}</div>
+    <div class="bbl b" style="padding:11px 16px;display:flex;gap:5px">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  msgs.appendChild(r); msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function callBackend(userText) {
+  history.push({ role:"USER", text:userText });
+  const res = await fetch(BACKEND, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ history })
+  });
+  const data = await res.json();
+  history.push({ role:"ASSISTANT", text:data.reply });
+  return data.reply;
+}
+
+function tts(text, pitch, cb) {
+  if (!window.speechSynthesis) { cb?.(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = TTS_RATE; u.pitch = pitch ?? 1;
+  u.onend = cb;
+  speechSynthesis.speak(u);
+}
+
+async function handleMsg(text) {
+  if (!text.trim() || isLoading || isSpeaking) return;
+  log.push({role:"user", text}); addMsg("user", text);
+  isLoading = true; micState("busy"); updateStat(); showTyping();
+  try {
+    const reply = await callBackend(text);
+    log.push({role:"bot", text:reply});
+    g("typing")?.remove(); addMsg("bot", reply);
+    setSpeaking(true);
+    tts(reply, 1, () => { setSpeaking(false); micState("idle"); updateStat(); });
+  } catch(err) {
+    g("typing")?.remove();
+    addMsg("bot", "[Error connecting to backend]");
+  } finally {
+    isLoading = false;
+    if (!isSpeaking) { micState("idle"); updateStat(); }
+  }
+}
+
+async function getFeedback() {
+  g("coach-section").style.display = "none";
+  g("coach-loading").style.display = "block";
+  try {
+    const res = await fetch("/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ history: history, persona_name: active.name })
+    });
+    const data = await res.json();
+    g("coach-content").textContent = data.feedback;
+    g("coach-section").style.display = "block";
+  } catch (err) { console.error(err); }
+  finally { g("coach-loading").style.display = "none"; }
+}
+
+function endSession() {
+  clearInterval(timerID); stopListening();
+  g("dtime").textContent = `Session complete · ${fmt(elapsed)}`;
+  g("dmeta").innerHTML = `Practice session with <strong>${active.name}</strong> · ${fmt(elapsed)}`;
+  const tr = g("transcript");
+  tr.innerHTML = log.length === 0 ? "No activity" : "";
+  log.forEach(m => {
+    const isu = m.role==="user";
+    const r = document.createElement("div"); r.className="trow";
+    r.innerHTML = `
+      <div class="av av-sm" style="background:${isu?"var(--red)":"var(--red-light)"};border:${isu?"none":"1.5px solid var(--red-mid)"};color:${isu?"#fff":"var(--red)"}">${isu?"YOU":active.avatar}</div>
+      <div style="flex:1"><div class="tlabel">${isu?"You":active.name}</div><div class="tbbl">${m.text}</div></div>`;
+    tr.appendChild(r);
+  });
+  showPage("debrief");
+  if(log.length > 0) getFeedback();
+}
+
+function startListening() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recog = new SR(); recog.continuous=false; recog.interimResults=true;
+  let final="";
+  recog.onresult = e => {
+    final = Array.from(e.results).map(r=>r[0].transcript).join("");
+    g("livetx").style.display="block"; g("livetx").textContent = final;
+  };
+  recog.onend = () => {
+    isListening=false; g("livetx").style.display="none";
+    if (final.trim()) handleMsg(final.trim());
+    micState("idle");
+  };
+  recog.start(); isListening=true; micState("live");
+}
+
+function stopListening() { recog?.stop(); isListening=false; }
+
+function setMode(m) {
+  mode = m;
+  g("vinput").style.display = m==="voice" ? "flex" : "none";
+  g("tinput").style.display = m==="text"  ? "flex" : "none";
+  g("btn-voice").className  = `mode-btn${m==="voice"?" on":""}`;
+  g("btn-text").className   = `mode-btn${m==="text"?" on":""}`;
+  if (m==="text") stopListening();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderGrid();
+  g("start-btn").onclick   = startSession;
+  g("end-btn").onclick     = endSession;
+  g("micbtn").onclick      = () => isListening ? stopListening() : startListening();
+  g("btn-voice").onclick   = () => setMode("voice");
+  g("btn-text").onclick    = () => setMode("text");
+  g("new-btn").onclick     = () => location.reload();
+  g("restart-btn").onclick = startSession;
+
+  // Filter tabs
+  document.querySelectorAll(".ftab").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".ftab").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); filter = b.dataset.f; renderGrid();
+  });
+
+  // Modal wiring
+  g("modal-close-btn").onclick  = closeModal;
+  g("modal-cancel-btn").onclick = closeModal;
+  g("modal-save-btn").onclick   = saveCustomPersona;
+  g("persona-modal").onclick = e => { if (e.target === g("persona-modal")) closeModal(); };
+  document.addEventListener("keydown", e => { if (e.key==="Escape") closeModal(); });
+  
+  const ta=g("txt"), sb=g("send-btn");
+  ta.oninput = () => sb.disabled = !ta.value.trim();
+  ta.onkeydown = e => { if (e.key==="Enter"&&!e.shiftKey) { e.preventDefault(); if(ta.value.trim()){handleMsg(ta.value.trim());ta.value="";sb.disabled=true;} }};
+  sb.onclick = () => { if(ta.value.trim()){handleMsg(ta.value.trim());ta.value="";sb.disabled=true;} };
+});
+</script>
+</body>
+</html>
