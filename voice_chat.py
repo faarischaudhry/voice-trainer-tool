@@ -6,6 +6,7 @@ import sys
 import json
 import os
 
+#VIOLA was here
 # Config
 COMPARTMENT_ID = "ocid1.compartment.oc1..aaaaaaaapqopu4porqrlm6pcfxhxxpycbmijz34ih2kg3rtfdeptiotmmizq"
 CONFIG_PROFILE  = "DEFAULT"
