@@ -6,7 +6,7 @@ import sys
 import json
 import os
 
-# ── Config ────────────────────────────────────────────────────────
+# Config
 COMPARTMENT_ID = "ocid1.compartment.oc1..aaaaaaaapqopu4porqrlm6pcfxhxxpycbmijz34ih2kg3rtfdeptiotmmizq"
 CONFIG_PROFILE  = "DEFAULT"
 MODEL_ID        = "ocid1.generativeaimodel.oc1.phx.amaaaaaask7dceyaaxukx6phswip5qkz4oeti6gg3mm4vbahum7bfjwzy3da"
@@ -45,7 +45,7 @@ Rules:
 - Do not volunteer info; make the engineer work for it.
 """
 
-# ── Custom Personas (file-backed) ─────────────────────────────────
+# Custom Personas
 def load_custom_personas():
     """Load custom personas from the JSON file."""
     if not os.path.exists(CUSTOM_PERSONAS_FILE):
@@ -73,7 +73,7 @@ def get_all_personas_for_terminal():
         }
     return combined
 
-# ── Voice Engine Setup ────────────────────────────────────────────
+# Voice Engine Setup
 def speak(text, voice_index=0):
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
@@ -95,7 +95,7 @@ def listen():
         except Exception:
             return ""
 
-# ── OCI Logic ─────────────────────────────────────────────────────
+# OCI Logic
 def build_client():
     config = oci.config.from_file('~/.oci/config', CONFIG_PROFILE)
     return oci.generative_ai_inference.GenerativeAiInferenceClient(
@@ -163,7 +163,7 @@ def get_coaching_feedback(client, history, persona_name):
     response = client.chat(chat_detail)
     return response.data.chat_response.choices[0].message.content[0].text.strip()
 
-# ── Main Loop (Terminal) ──────────────────────────────────────────
+# Main Loop
 def main():
     print("\nOCI CUSTOMER VOICE PRACTICE TOOL")
     all_personas = get_all_personas_for_terminal()
@@ -194,7 +194,7 @@ def main():
         print(f"\n{persona['name'].split()[0]}: {response_text}")
         speak(response_text, voice_index=persona["voice_id"])
 
-# ── Web Mode ──────────────────────────────────────────────────────
+# Web Mode
 def run_web():
     from flask import Flask, request, jsonify
     from flask_cors import CORS
