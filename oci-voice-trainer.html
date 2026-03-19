@@ -394,21 +394,19 @@
 <script>
 // ... (Your existing PERSONAS, config, and state) ...
 const BACKEND  = "/chat";
-const TTS_RATE = 1.1;
-
 const PERSONAS = [
-  { id:"1", name:"Alex",  label:"Skeptical CTO",          
-    avatar:"AX", difficulty:"Hard",
-    desc:"A skeptical CTO at a mid-sized fintech company. Concerned about cloud costs, vendor lock-in, and security." },
-  { id:"2", name:"Maria", label:"Eager VP of Engineering",  
-    avatar:"MR", difficulty:"Easy",
-    desc:"A VP of Engineering at a retail company. Enthusiastic but lacks deep technical knowledge." },
-  { id:"3", name:"James", label:"Procurement Manager",      
-    avatar:"JM", difficulty:"Medium",
-    desc:"A procurement manager evaluating OCI against Azure and GCP purely on cost and SLA terms." },
-  { id:"4", name:"Sara",  label:"Unhappy OCI Customer",     
-    avatar:"SR", difficulty:"Hard",
-    desc:"An existing OCI customer frustrated with a recent outage. Starts conversations irritably." },
+  { id:"1", name:"Dave",   label:"Senior Oracle DBA",    avatar:"DV", difficulty:"Hard",
+    voice_id:0, ssml_rate:"medium",   ssml_pitch:"low",
+    desc: "A Senior Oracle DBA with 18 years experience. Skeptical of cloud, worried about RAC performance vs ExaCS, and extremely focused on SYSDBA access and licensing gotchas." },
+  { id:"2", name:"Priya",  label:"Solutions Architect",  avatar:"PY", difficulty:"Medium",
+    voice_id:1, ssml_rate:"medium", ssml_pitch:"medium",
+    desc: "Healthcare architect focused on hybrid cloud strategies. Asks pointed questions about HL7/FHIR integrations, FastConnect vs VPN, and HIPAA BAA coverage." },
+  { id:"3", name:"Marcus", label:"Frustrated Lead DBA",  avatar:"MC", difficulty:"Hard",
+    voice_id:0, ssml_rate:"fast",   ssml_pitch:"low",
+    desc: "In the middle of a turbulent migration. Dealing with ZDM bugs, TDE-encryption issues, and performance regressions on Block Volumes. Wants documentation, not sales talk." },
+  { id:"4", name:"Linda",  label:"Enterprise Architect", avatar:"LD", difficulty:"Medium",
+    voice_id:1, ssml_rate:"medium",   ssml_pitch:"medium",
+    desc: "A license audit survivor. Views OCI through a compliance lens. Focused on ULA applicability, OCPU counting, and Oracle's audit rights in cloud environments." },
 ];
 
 const sysPrompt = desc => `
@@ -653,20 +651,24 @@ async function callBackend(userText) {
   const res = await fetch(BACKEND, {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ history })
+    body: JSON.stringify({
+      history,
+      voice_id: active.voice_id   ?? 0,
+      rate:     active.ssml_rate  ?? "medium",
+      pitch:    active.ssml_pitch ?? "low",
+    })
   });
   const data = await res.json();
   history.push({ role:"ASSISTANT", text:data.reply });
-  return data.reply;
+  return data; // { reply, audio }
 }
 
-function tts(text, pitch, cb) {
-  if (!window.speechSynthesis) { cb?.(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = TTS_RATE; u.pitch = pitch ?? 1;
-  u.onend = cb;
-  speechSynthesis.speak(u);
+function playAudio(b64, cb) {
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const url   = URL.createObjectURL(new Blob([bytes], { type:"audio/mpeg" }));
+  const el    = new Audio(url);
+  el.onended  = () => { URL.revokeObjectURL(url); cb?.(); };
+  el.play();
 }
 
 async function handleMsg(text) {
@@ -674,11 +676,11 @@ async function handleMsg(text) {
   log.push({role:"user", text}); addMsg("user", text);
   isLoading = true; micState("busy"); updateStat(); showTyping();
   try {
-    const reply = await callBackend(text);
+    const { reply, audio } = await callBackend(text);
     log.push({role:"bot", text:reply});
     g("typing")?.remove(); addMsg("bot", reply);
     setSpeaking(true);
-    tts(reply, 1, () => { setSpeaking(false); micState("idle"); updateStat(); });
+    playAudio(audio, () => { setSpeaking(false); micState("idle"); updateStat(); });
   } catch(err) {
     g("typing")?.remove();
     addMsg("bot", "[Error connecting to backend]");
