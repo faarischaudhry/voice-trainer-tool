@@ -3,289 +3,927 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>OCI Voice Trainer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <title>OCI Discovery Trainer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    /* ... (Rest of your existing styles) ... */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #F7F3F0; color: #1C1410; min-height: 100vh; }
+ 
     :root {
-      --red:#C74634; --red-dark:#9B2D1F; --red-deep:#6B1A10;
-      --red-light:#F9EDEB; --red-mid:#E5B5AD;
-      --bg:#F7F3F0; --bg-deep:#EDE6E0; --surface:#FFFFFF;
-      --border:#DDD0C8; --border-md:#C8B8B0;
-      --text:#1C1410; --text-md:#5A4438; --text-mut:#9A8070;
-      --gold:#C8900A; --gold-bg:#FDF6E3; --gold-bdr:#E8CC80;
-      --serif:'Source Serif 4', Georgia, serif;
+      --red: #C74634;
+      --red-dark: #9B2D1F;
+      --red-deep: #5C1A0F;
+      --red-light: #FDF0EE;
+      --red-mid: #E8B0A5;
+      --bg: #F5F0EC;
+      --bg-deep: #EDE5DF;
+      --bg-card: #FDFAF8;
+      --surface: #FFFFFF;
+      --border: #DDD5CE;
+      --border-md: #C8BAB2;
+      --text: #1A1210;
+      --text-md: #5C4840;
+      --text-mut: #9A8878;
+      --gold: #B8820A;
+      --gold-bg: #FDF8EC;
+      --gold-bdr: #E0C870;
+      --green: #1A6B3C;
+      --green-bg: #EDF7F2;
+      --green-bdr: #A0D4B8;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+      --mono: 'DM Mono', monospace;
     }
-
-    @keyframes fadeUp  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-    @keyframes ripple  { 0%{transform:scale(.8);opacity:.9} 100%{transform:scale(2.4);opacity:0} }
-    @keyframes pulse   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
-    @keyframes bounce  { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-
-    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
-
-    /* NAV */
-    nav { background:var(--surface); border-bottom:2px solid var(--red); height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; box-shadow:0 2px 8px rgba(199,70,52,.08); position:sticky; top:0; z-index:100; }
-    .logo { display:flex; align-items:center; gap:12px; }
-    .logo-o   { width:36px; height:36px; background:var(--red); border-radius:6px 0 0 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:var(--serif); font-style:italic; font-weight:700; font-size:16px; }
-    .logo-dot { width:36px; height:36px; background:var(--red-dark); border-radius:0 6px 6px 0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.4); font-size:10px; }
-    .logo-text { border-left:1px solid var(--border); padding-left:12px; }
-    .logo-title { font-family:var(--serif); font-weight:700; font-size:14px; }
-    .logo-sub   { font-size:10px; color:var(--text-mut); margin-top:2px; }
-
-    /* BUTTONS */
-    .btn { padding:10px 24px; border-radius:5px; font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all .13s; }
-    .btn-red   { background:var(--red); color:#fff; }
-    .btn-red:hover { background:var(--red-dark); }
-    .btn-red:disabled { background:var(--bg-deep); color:var(--text-mut); cursor:not-allowed; }
-    .btn-ghost { background:var(--surface); border:1px solid var(--border); color:var(--text-md); }
-    .btn-ghost:hover { border-color:var(--red-mid); color:var(--red); }
-    .btn-sm { padding:5px 14px; font-size:12px; border-radius:4px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-md); transition:all .13s; }
-    .btn-sm:hover { background:var(--red-light); border-color:var(--red-mid); color:var(--red); }
-    .ftab { padding:4px 13px; font-size:12px; border-radius:3px; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-md); transition:all .13s; }
-    .ftab:hover { border-color:var(--red-mid); color:var(--red); }
-    .ftab.on { background:var(--red); border-color:var(--red); color:#fff; }
-    .mode-btn { flex:1; border:1px solid var(--border); background:none; cursor:pointer; border-radius:4px; padding:6px 8px; font-size:11px; color:var(--text-md); transition:all .13s; }
+ 
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+ 
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
+ 
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp    { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
+    @keyframes slideIn   { from { opacity:0; transform:translateX(-8px) } to { opacity:1; transform:none } }
+    @keyframes pulse     { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    @keyframes ripple    { 0%{transform:scale(.8);opacity:.8} 100%{transform:scale(2.6);opacity:0} }
+    @keyframes bounce    { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+    @keyframes shimmer   { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:.3} }
+ 
+    /* ── NAV ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 2px solid var(--red);
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      box-shadow: 0 2px 12px rgba(199,70,52,.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .logo-o {
+      width: 34px; height: 34px;
+      background: var(--red);
+      border-radius: 5px 0 0 5px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -1px;
+    }
+    .logo-ci {
+      width: 34px; height: 34px;
+      background: var(--red-dark);
+      border-radius: 0 5px 5px 0;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.35);
+      font-size: 9px;
+      font-family: var(--mono);
+    }
+    .logo-text { border-left: 1px solid var(--border); padding-left: 14px; }
+    .logo-title { font-family: var(--serif); font-weight: 700; font-size: 13px; color: var(--text); letter-spacing: .2px; }
+    .logo-sub   { font-size: 10px; color: var(--text-mut); margin-top: 2px; letter-spacing: .3px; }
+    .nav-pill {
+      background: var(--red-light);
+      border: 1px solid var(--red-mid);
+      color: var(--red-dark);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+ 
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeUp .3s ease; }
+    #session-page { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+    #session-page.active { display: flex; }
+ 
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 11px 26px;
+      border-radius: 5px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .14s;
+      letter-spacing: .2px;
+    }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-red:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(199,70,52,.25); }
+    .btn-red:disabled { background: var(--bg-deep); color: var(--text-mut); cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text-md); }
+    .btn-ghost:hover { border-color: var(--red-mid); color: var(--red); }
+    .btn-sm { padding: 5px 14px; font-size: 11px; border-radius: 4px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text-md); transition: all .13s; font-family: var(--sans); }
+    .btn-sm:hover { background: var(--red-light); border-color: var(--red-mid); color: var(--red); }
+    .ftab { padding: 4px 14px; font-size: 11px; border-radius: 3px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text-md); transition: all .13s; font-family: var(--sans); font-weight: 500; }
+    .ftab:hover { border-color: var(--red-mid); color: var(--red); }
+    .ftab.on { background: var(--red); border-color: var(--red); color: #fff; }
+    .mode-btn { flex:1; border:1px solid var(--border); background:none; cursor:pointer; border-radius:4px; padding:6px 8px; font-size:11px; color:var(--text-md); transition:all .13s; font-family: var(--sans); font-weight: 500; }
     .mode-btn:hover { border-color:var(--red-mid); color:var(--red); }
     .mode-btn.on { background:var(--red); border-color:var(--red); color:#fff; }
-
-    /* SECTION HEADER */
-    .sh { font-size:11px; font-weight:700; letter-spacing:2px; color:var(--text-mut); text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+ 
+    /* ── SECTION HEADER ── */
+    .sh {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--text-mut);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
     .sh::before { content:''; width:3px; height:14px; background:var(--red); border-radius:2px; flex-shrink:0; }
     .sh::after  { content:''; flex:1; height:1px; background:var(--border); }
-
-    /* HERO */
-    .hero { background:linear-gradient(135deg,var(--red-deep) 0%,var(--red) 55%,#D4604A 100%); border-radius:0 0 14px 14px; padding:38px 44px 34px; margin-bottom:40px; position:relative; overflow:hidden; }
-    .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(255,255,255,.07); }
-    .hero::after  { content:''; position:absolute; top:20px; right:60px; width:130px; height:130px; border-radius:50%; border:1px solid rgba(255,255,255,.05); }
-    .hero-inner { position:relative; z-index:1; max-width:560px; }
-    .hero-eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-    .hero-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.5); }
-    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; color:rgba(255,255,255,.65); text-transform:uppercase; }
-    .hero h1 { font-family:var(--serif); font-size:clamp(22px,3.5vw,36px); font-weight:700; color:#fff; margin-bottom:12px; line-height:1.2; }
-    .hero p  { font-size:14px; line-height:1.8; color:rgba(255,255,255,.85); }
-
-    /* HOW IT WORKS */
-    .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:40px; }
-    .how-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; position:relative; overflow:hidden; }
-    .how-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:8px 8px 0 0; }
-    .how-num { font-family:var(--serif); font-weight:700; font-size:18px; color:var(--red); opacity:.2; }
-
-    /* PERSONA GRID */
-    .pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-bottom:28px; }
-    .pcard { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; transition:all .15s; position:relative; overflow:hidden; }
-    .pcard:hover { border-color:var(--red-mid); box-shadow:0 4px 18px rgba(199,70,52,.12); transform:translateY(-1px); }
-    .pcard.sel { border-color:var(--red); box-shadow:0 0 0 3px var(--red-light); }
-    .pcard-stripe { display:none; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:10px 10px 0 0; }
-    .pcard.sel .pcard-stripe { display:block; }
-    .pcard-check { display:none; position:absolute; top:12px; right:12px; width:20px; height:20px; border-radius:50%; background:var(--red); align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; }
-    .pcard.sel .pcard-check { display:flex; }
-
-    /* AVATAR */
-    .av { border-radius:8px; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; color:var(--red); flex-shrink:0; }
-    .av-lg { width:44px; height:44px; font-size:13px; }
-    .av-md { width:60px; height:60px; font-size:18px; border-radius:12px; }
-    .av-sm { width:28px; height:28px; font-size:9px; border-radius:6px; }
-    .diff { font-size:10px; padding:2px 9px; border-radius:3px; font-weight:600; }
-    .easy   { background:#fdf6ee; color:#7a4a10; border:1px solid #e0b870; }
-    .medium { background:#fef3f1; color:#7a2a10; border:1px solid #dba090; }
-    .hard   { background:#f9eeee; color:#7a1a1a; border:1px solid #cc8080; }
-
-    /* PAGES */
-    .page { display:none; }
-    .page.active { display:block; }
-    #session-page { display:none; height:100vh; flex-direction:column; overflow:hidden; }
-    #session-page.active { display:flex; }
-
-    /* SESSION */
-    #snav  { height:48px; background:var(--surface); border-bottom:2px solid var(--red); display:flex; align-items:center; justify-content:space-between; padding:0 18px; flex-shrink:0; }
-    #sbody { flex:1; display:flex; overflow:hidden; }
-    #sidebar { width:196px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:12px; gap:10px; }
-    #ppanel { flex:1; background:#F2EBE6; border-radius:8px; border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; position:relative; overflow:hidden; }
-    #ppanel::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:8px 8px 0 0; }
-    .stag { position:absolute; top:10px; left:10px; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:2px 6px; font-size:8px; color:var(--text-mut); font-weight:700; letter-spacing:.5px; }
-    #mpanel { background:var(--bg-deep); border-radius:7px; padding:10px; border:1px solid var(--border); }
-    #chat   { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-    #msgs   { flex:1; overflow-y:auto; padding:22px 24px; display:flex; flex-direction:column; gap:14px; background:var(--bg); }
-    #ibar   { border-top:1px solid var(--border); padding:14px 18px 16px; background:var(--surface); flex-shrink:0; }
-
-    /* BUBBLES */
-    .mrow { display:flex; gap:8px; align-items:flex-end; animation:fadeUp .2s ease; }
-    .mrow.u { flex-direction:row-reverse; }
-    .bbl { max-width:70%; padding:11px 15px; font-size:14px; line-height:1.65; }
-    .bbl.b { background:var(--surface); border:1px solid var(--border); border-radius:14px 14px 14px 4px; color:var(--text-md); box-shadow:0 1px 4px rgba(0,0,0,.05); }
-    .bbl.u { background:var(--red); color:#fff; border-radius:14px 14px 4px 14px; }
-    .dot { width:6px; height:6px; border-radius:50%; background:var(--border-md); animation:bounce 1.2s infinite; }
-    .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
-
-    /* MIC */
-    #micbtn { width:64px; height:64px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; transition:all .15s; position:relative; flex-shrink:0; }
-    #micbtn.idle { background:var(--red-light); color:var(--red); box-shadow:0 2px 8px rgba(0,0,0,.08); }
-    #micbtn.live { background:var(--red); color:#fff; box-shadow:0 0 0 4px var(--red-light); animation:pulse 1.5s infinite; }
-    #micbtn.busy { background:var(--bg-deep); color:var(--text-mut); cursor:not-allowed; }
-    .mring { display:none; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--red); animation:ripple 1s ease-out infinite; pointer-events:none; }
-    #micbtn.live .mring { display:block; }
-    .sring  { display:none; position:absolute; border-radius:50%; border:2px solid var(--red-mid); animation:ripple 1.2s ease-out infinite; }
-    .sring2 { display:none; position:absolute; border-radius:50%; border:2px solid var(--red); opacity:.4; animation:ripple 1.2s ease-out infinite .3s; }
-
-    /* MISC */
-    #livetx { display:none; width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:9px 13px; font-size:13px; color:var(--text-md); min-height:36px; margin-bottom:10px; }
-    #micerr { display:none; margin-top:8px; font-size:10px; color:var(--gold); background:var(--gold-bg); border:1px solid var(--gold-bdr); border-radius:4px; padding:5px 8px; line-height:1.5; }
-    #timer  { font-family:var(--serif); font-weight:700; font-size:14px; color:var(--text-mut); min-width:44px; text-align:right; }
-    .empty  { margin:auto; text-align:center; color:var(--text-mut); line-height:1.8; padding:40px 20px; }
-    .emav   { width:56px; height:56px; border-radius:50%; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; font-size:16px; color:var(--red); margin:0 auto 14px; }
-
-    /* DEBRIEF */
-    .trow { display:flex; gap:10px; align-items:flex-start; }
-    .tlabel { font-size:10px; font-weight:600; color:var(--text-mut); margin-bottom:4px; letter-spacing:.3px; text-transform:uppercase; }
-    .tbbl  { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--text-md); line-height:1.65; }
-
-    /* CUSTOM PERSONA MODAL */
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(28,20,16,.45); z-index:200; align-items:center; justify-content:center; padding:20px; }
-    .modal-overlay.open { display:flex; }
-    .modal { background:var(--surface); border-radius:12px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.18); animation:fadeUp .2s ease; }
-    .modal-head { padding:22px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--surface); z-index:1; }
-    .modal-head h3 { font-family:var(--serif); font-weight:700; font-size:18px; }
-    .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-mut); line-height:1; padding:4px 8px; border-radius:4px; }
-    .modal-close:hover { background:var(--bg-deep); color:var(--text); }
-    .modal-body { padding:20px 24px 24px; }
-    .fgroup { margin-bottom:16px; }
-    .fgroup label { display:block; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--text-mut); text-transform:uppercase; margin-bottom:6px; }
-    .fgroup input, .fgroup textarea, .fgroup select {
-      width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:5px;
-      font-family:inherit; font-size:13px; color:var(--text); background:var(--bg);
-      outline:none; transition:border-color .13s;
+ 
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(138deg, var(--red-deep) 0%, #7A2216 40%, var(--red) 75%, #D4604A 100%);
+      border-radius: 0 0 20px 20px;
+      padding: 52px 52px 44px;
+      margin-bottom: 44px;
+      position: relative;
+      overflow: hidden;
     }
-    .fgroup input:focus, .fgroup textarea:focus, .fgroup select:focus { border-color:var(--red); }
-    .fgroup textarea { resize:vertical; min-height:90px; line-height:1.6; }
-    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .modal-foot { display:flex; gap:10px; justify-content:flex-end; padding-top:4px; }
-
-    /* CUSTOM PERSONA CARD */
-    .pcard-add { border-style:dashed; border-color:var(--border-md); background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-height:170px; }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .hero-glow {
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,200,180,.12) 0%, transparent 70%);
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 620px; }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 20px;
+      padding: 4px 14px 4px 8px;
+      margin-bottom: 20px;
+    }
+    .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #FF9980; animation: blink 2s infinite; }
+    .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,.8); text-transform: uppercase; }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .hero h1 em { font-style: italic; color: rgba(255,220,210,.9); }
+    .hero p { font-size: 14px; line-height: 1.85; color: rgba(255,255,255,.8); max-width: 520px; }
+    .hero-badges {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 4px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: rgba(255,255,255,.85);
+      font-weight: 500;
+    }
+ 
+    /* ── DISCOVERY CALLOUT ── */
+    .discovery-banner {
+      background: var(--gold-bg);
+      border: 1px solid var(--gold-bdr);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 36px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .discovery-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .discovery-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .discovery-text {
+      font-size: 13px;
+      color: #6B5020;
+      line-height: 1.7;
+    }
+    .discovery-pills {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .discovery-pill {
+      background: rgba(184,130,10,.1);
+      border: 1px solid var(--gold-bdr);
+      border-radius: 3px;
+      padding: 2px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+ 
+    /* ── HOW IT WORKS ── */
+    .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 44px; }
+    .how-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .how-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:10px 10px 0 0; }
+    .how-num { font-family: var(--serif); font-weight: 900; font-size: 42px; color: var(--red); opacity: .07; line-height: 1; margin-bottom: 4px; }
+    .how-icon { font-size: 18px; margin-bottom: 8px; }
+    .how-title { font-weight: 600; font-size: 13px; margin-bottom: 5px; }
+    .how-desc { font-size: 12px; color: var(--text-md); line-height: 1.65; }
+    code { background: var(--bg-deep); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 11px; }
+ 
+    /* ── PERSONA GRID ── */
+    .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px,1fr)); gap: 14px; margin-bottom: 28px; }
+ 
+    .pcard {
+      cursor: pointer;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      transition: all .16s;
+      position: relative;
+      overflow: hidden;
+    }
+    .pcard:hover { border-color: var(--red-mid); box-shadow: 0 6px 24px rgba(199,70,52,.1); transform: translateY(-2px); }
+    .pcard.sel {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-light), 0 6px 24px rgba(199,70,52,.12);
+    }
+    .pcard-stripe { display:none; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:12px 12px 0 0; }
+    .pcard.sel .pcard-stripe { display:block; }
+    .pcard-check { display:none; position:absolute; top:14px; right:14px; width:22px; height:22px; border-radius:50%; background:var(--red); align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; box-shadow: 0 2px 6px rgba(199,70,52,.3); }
+    .pcard.sel .pcard-check { display:flex; }
+ 
+    /* Avatar */
+    .av { border-radius:8px; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; color:var(--red); flex-shrink:0; }
+    .av-lg { width:46px; height:46px; font-size:13px; }
+    .av-md { width:62px; height:62px; font-size:18px; border-radius:12px; }
+    .av-sm { width:28px; height:28px; font-size:9px; border-radius:6px; }
+ 
+    /* Difficulty badges */
+    .diff { font-size:10px; padding:2px 9px; border-radius:3px; font-weight:600; letter-spacing:.3px; }
+    .easy   { background:#EEF7F1; color:#1A6B3C; border:1px solid #A0D4B8; }
+    .medium { background:#FEF3F1; color:#8B3020; border:1px solid #D8A090; }
+    .hard   { background:#F7EDED; color:#6A1A1A; border:1px solid #C88080; }
+ 
+    /* Persona info sections */
+    .pcard-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .pcard-role { font-size: 11px; color: var(--text-md); margin-top: 2px; }
+    .pcard-company { font-size: 10px; color: var(--text-mut); margin-top: 1px; font-family: var(--mono); }
+    .pcard-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bg-deep); padding-top:12px; }
+    .pcard-summary {
+      font-size: 12px;
+      color: var(--text-md);
+      line-height: 1.65;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .pcard:hover .pcard-summary,
+    .pcard.sel .pcard-summary {
+      -webkit-line-clamp: unset;
+      overflow: visible;
+    }
+ 
+    /* Industry badge on persona cards */
+    .pcard-industry {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .9px;
+      color: var(--text-mut);
+      text-transform: uppercase;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pcard-industry::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--ind-color, var(--border-md));
+    }
+ 
+    /* Industry accent colors */
+    .pcard[data-industry="energy"]     { --ind-color: #D97706; }
+    .pcard[data-industry="financial"]  { --ind-color: #1D4ED8; }
+    .pcard[data-industry="healthcare"] { --ind-color: #059669; }
+    .pcard[data-industry="public"]     { --ind-color: #7C3AED; }
+    .pcard[data-industry="custom"]     { --ind-color: var(--red); }
+ 
+    /* Industry filter pills — colored when active */
+    .ftab[data-f="Energy"].on    { background: #D97706; border-color: #D97706; }
+    .ftab[data-f="Financial"].on { background: #1D4ED8; border-color: #1D4ED8; }
+    .ftab[data-f="Healthcare"].on{ background: #059669; border-color: #059669; }
+    .ftab[data-f="Public Sector"].on { background: #7C3AED; border-color: #7C3AED; }
+ 
+ 
+    .pcard-add { border-style:dashed; border-color:var(--border-md); background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-height:200px; }
     .pcard-add:hover { border-color:var(--red); background:var(--red-light); }
-    .pcard-add .add-icon { width:42px; height:42px; border-radius:50%; background:var(--red-light); border:2px dashed var(--red-mid); display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .13s; }
+    .add-icon { width:44px; height:44px; border-radius:50%; background:var(--red-light); border:2px dashed var(--red-mid); display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .13s; }
     .pcard-add:hover .add-icon { background:var(--red); border-style:solid; }
-    .pcard-add:hover .add-icon span { filter:brightness(10); }
+    .pcard-add:hover .add-icon span { filter: brightness(10); }
     .pcard-custom { position:relative; }
-    .pcard-del { display:none; position:absolute; top:8px; right:8px; background:none; border:1px solid var(--border); border-radius:4px; font-size:11px; padding:2px 7px; cursor:pointer; color:var(--text-mut); z-index:2; }
+    .pcard-del { display:none; position:absolute; top:10px; right:10px; background:none; border:1px solid var(--border); border-radius:4px; font-size:10px; padding:2px 7px; cursor:pointer; color:var(--text-mut); z-index:2; }
     .pcard-custom:hover .pcard-del { display:block; }
     .pcard-del:hover { background:var(--red-light); border-color:var(--red-mid); color:var(--red); }
-
-    /* COACH FEEDBACK STYLES */
-    #coach-section { margin-top: 32px; animation: fadeUp .5s ease; display: none; }
-    .coach-card { 
-      background: #FFF9E6; border: 1px solid #E8CC80; border-radius: 12px; 
-      padding: 24px; position: relative; overflow: hidden;
+ 
+    /* ── SESSION PAGE ── */
+    #snav {
+      height: 50px;
+      background: var(--surface);
+      border-bottom: 2px solid var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-shrink: 0;
     }
-    .coach-card::before { 
-      content: 'COACH EVALUATION'; position: absolute; top: 0; left: 0; 
-      background: var(--gold); color: #fff; font-size: 9px; font-weight: 800; 
-      padding: 4px 12px; border-radius: 0 0 8px 0; letter-spacing: 1px;
+    #sbody { flex:1; display:flex; overflow:hidden; }
+ 
+    /* Sidebar */
+    #sidebar {
+      width: 204px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 12px;
+      overflow-y: auto;
     }
-    .coach-text { 
-      font-size: 14px; line-height: 1.7; color: #5C4B20; white-space: pre-wrap; 
+    #ppanel {
+      flex:1;
+      background: var(--bg-deep);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 14px;
+      position: relative;
+      overflow: hidden;
     }
-    #coach-loading { 
-      text-align: center; padding: 20px; color: var(--text-mut); font-size: 13px; 
-      font-style: italic; display: none;
+    #ppanel::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); border-radius:10px 10px 0 0; }
+ 
+    /* ── SE NOTES PANEL ── */
+    #notes-panel {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
+    #se-notes {
+      flex: 1;
+      width: 100%;
+      min-height: 180px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      transition: border-color .13s;
+    }
+    #se-notes:focus { border-color: var(--red); background: var(--surface); }
+    #se-notes::placeholder { color: var(--text-mut); font-style: italic; }
+ 
+    .stag { position:absolute; top:10px; left:10px; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:2px 7px; font-size:8px; color:var(--text-mut); font-weight:700; letter-spacing:.5px; font-family: var(--mono); }
+ 
+    #mpanel { background:var(--bg-deep); border-radius:7px; padding:10px; border:1px solid var(--border); }
+ 
+    /* Chat */
+    #chat { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    #msgs { flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:16px; background:var(--bg); }
+    #ibar { border-top:1px solid var(--border); padding:14px 20px 16px; background:var(--surface); flex-shrink:0; }
+ 
+    /* Bubbles */
+    .mrow { display:flex; gap:10px; align-items:flex-end; animation:fadeUp .2s ease; }
+    .mrow.u { flex-direction:row-reverse; }
+    .bbl {
+      max-width: 68%;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      font-family: var(--sans);
+    }
+    .bbl.b {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px 14px 14px 4px;
+      color: var(--text-md);
+      box-shadow: 0 1px 5px rgba(0,0,0,.05);
+    }
+    .bbl.u {
+      background: var(--red);
+      color: #fff;
+      border-radius: 14px 14px 4px 14px;
+    }
+    .msg-meta { font-size: 10px; color: var(--text-mut); margin-top: 4px; }
+    .mrow.u .msg-meta { text-align: right; }
+ 
+    /* Typing dots */
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--border-md); animation:bounce 1.2s infinite; }
+    .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+ 
+    /* Speaking rings */
+    .sring  { display:none; position:absolute; border-radius:50%; border:2px solid var(--red-mid); animation:ripple 1.2s ease-out infinite; pointer-events: none; }
+    .sring2 { display:none; position:absolute; border-radius:50%; border:2px solid var(--red); opacity:.35; animation:ripple 1.2s ease-out infinite .35s; pointer-events: none; }
+ 
+    /* Mic button */
+    #micbtn { width:64px; height:64px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; transition:all .15s; position:relative; flex-shrink:0; }
+    #micbtn.idle { background:var(--red-light); color:var(--red); box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    #micbtn.idle:hover { background:var(--red-mid); }
+    #micbtn.live { background:var(--red); color:#fff; box-shadow:0 0 0 5px var(--red-light); animation:pulse 1.5s infinite; }
+    #micbtn.busy { background:var(--bg-deep); color:var(--text-mut); cursor:not-allowed; }
+    .mring { display:none; position:absolute; inset:-8px; border-radius:50%; border:2px solid var(--red); animation:ripple 1s ease-out infinite; pointer-events:none; }
+    #micbtn.live .mring { display:block; }
+ 
+    #livetx { display:none; width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:9px 14px; font-size:13px; color:var(--text-md); min-height:36px; margin-bottom:10px; font-style: italic; }
+    #micerr { display:none; margin-top:8px; font-size:10px; color:var(--gold); background:var(--gold-bg); border:1px solid var(--gold-bdr); border-radius:4px; padding:5px 9px; line-height:1.5; }
+    #timer { font-family:var(--mono); font-weight:500; font-size:13px; color:var(--text-mut); min-width:44px; text-align:right; }
+ 
+    .empty { margin:auto; text-align:center; color:var(--text-mut); line-height:1.8; padding:48px 24px; }
+    .emav { width:60px; height:60px; border-radius:50%; background:var(--red-light); border:2px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; font-size:18px; color:var(--red); margin:0 auto 16px; }
+ 
+    /* Discovery hint bar */
+    .discovery-hint {
+      background: var(--gold-bg);
+      border-top: 1px solid var(--gold-bdr);
+      padding: 8px 20px;
+      font-size: 11px;
+      color: #6B5020;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .discovery-hint strong { color: var(--gold); }
+ 
+    /* ── DEBRIEF ── */
+    #debrief-body { max-width: 860px; margin: 0 auto; padding: 40px 24px 64px; animation: fadeUp .35s ease; }
+ 
+    .debrief-header {
+      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red) 100%);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .debrief-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .debrief-header-inner { position: relative; z-index: 1; }
+    .debrief-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 10px;
+    }
+    .debrief-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .debrief-meta {
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+      line-height: 1.6;
+    }
+    .debrief-timer-badge {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      padding: 10px 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .debrief-timer-badge .dt-val {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      display: block;
+    }
+    .debrief-timer-badge .dt-lbl {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-top: 3px;
+      display: block;
+    }
+ 
+    /* Transcript section */
+    .debrief-section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .debrief-section-icon {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .dsi-transcript { background: var(--red-light); }
+    .dsi-coach      { background: #FFF8E6; }
+    .debrief-section-label {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+ 
+    .trow { display:flex; gap:12px; align-items:flex-start; }
+    .tlabel { font-size:10px; font-weight:600; color:var(--text-mut); margin-bottom:4px; letter-spacing:.3px; text-transform:uppercase; font-family: var(--mono); }
+    .tbbl { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 15px; font-size:14px; color:var(--text-md); line-height:1.7; }
+ 
+    /* Coach / consulting section */
+    #coach-section { margin-top: 36px; animation: fadeUp .5s ease; display: none; }
+ 
+    .coach-report {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+    .coach-report-header {
+      background: linear-gradient(135deg, #7C5A00 0%, #B8820A 100%);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .coach-report-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .coach-report-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .coach-report-subtitle {
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+      margin-top: 2px;
+      letter-spacing: .3px;
+    }
+    .coach-report-body {
+      padding: 28px;
+      background: #FFFDF5;
+    }
+    .coach-text {
+      font-size: 14px;
+      line-height: 1.85;
+      color: #3D2E00;
+      white-space: pre-wrap;
+      font-family: var(--sans);
+    }
+    #coach-loading {
+      display: none;
+      margin: 24px 0;
+      background: var(--gold-bg);
+      border: 1px solid var(--gold-bdr);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+    }
+    .coach-loading-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--gold-bdr);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .coach-loading-text {
+      font-size: 13px;
+      color: #6B5020;
+      font-style: italic;
+    }
+ 
+    .debrief-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+ 
+    /* ── MODAL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,18,14,.5); z-index:200; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(2px); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--surface); border-radius:14px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); animation:fadeUp .2s ease; }
+    .modal-head { padding:24px 26px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--surface); z-index:1; }
+    .modal-head h3 { font-family:var(--serif); font-weight:700; font-size:19px; }
+    .modal-close { background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-mut); padding:5px 9px; border-radius:4px; }
+    .modal-close:hover { background:var(--bg-deep); color:var(--text); }
+    .modal-body { padding:22px 26px 26px; }
+    .fgroup { margin-bottom:18px; }
+    .fgroup label { display:block; font-size:10px; font-weight:700; letter-spacing:1px; color:var(--text-mut); text-transform:uppercase; margin-bottom:7px; }
+    .fgroup input, .fgroup textarea, .fgroup select {
+      width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:6px;
+      font-family:var(--sans); font-size:13px; color:var(--text); background:var(--bg);
+      outline:none; transition:border-color .13s;
+    }
+    .fgroup input:focus, .fgroup textarea:focus, .fgroup select:focus { border-color:var(--red); background: var(--surface); }
+    .fgroup textarea { resize:vertical; min-height:100px; line-height:1.65; }
+    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .modal-foot { display:flex; gap:10px; justify-content:flex-end; padding-top:6px; }
+ 
+    /* ── DISCOVERY TIPS IN SESSION ── */
+    .tip-card {
+      background: var(--green-bg);
+      border: 1px solid var(--green-bdr);
+      border-radius: 7px;
+      padding: 10px 12px;
+    }
+    .tip-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+    .tip-item {
+      font-size: 11px;
+      color: #1A4A30;
+      line-height: 1.55;
+      padding: 2px 0;
+      display: flex;
+      gap: 5px;
+    }
+    .tip-item::before { content:'→'; color:var(--green); font-weight:700; flex-shrink:0; }
+ 
   </style>
 </head>
 <body>
-
+ 
+<!-- ══════════════════════════════════════════════ LOBBY ══ -->
 <div id="lobby" class="page active">
-    <nav>
+  <nav>
     <div class="logo">
-      <div style="display:flex"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
+      <div class="logo-mark">
+        <div class="logo-o">O</div>
+        <div class="logo-ci">CI</div>
+      </div>
       <div class="logo-text">
-        <div class="logo-title">OCI Voice Trainer</div>
-        <div class="logo-sub">Oracle Cloud Engineer Practice Tool</div>
+        <div class="logo-title">OCI Discovery Trainer</div>
+        <div class="logo-sub">Oracle Cloud · SE Practice Suite</div>
       </div>
     </div>
+    <div class="nav-pill">Discovery Sessions</div>
   </nav>
-
-  <div style="max-width:980px;margin:0 auto;padding:0 20px 48px">
+ 
+  <div style="max-width:1020px;margin:0 auto;padding:0 24px 56px">
+ 
+    <!-- HERO -->
     <div class="hero">
+      <div class="hero-grid"></div>
+      <div class="hero-glow"></div>
       <div class="hero-inner">
-        <div class="hero-eyebrow"><div class="hero-dot"></div><span class="hero-label">Oracle Cloud · Practice Suite</span></div>
-        <h1>OCI Customer Voice<br>Roleplay Trainer</h1>
-        <p>Practice handling real OCI sales and support scenarios with AI-powered customer personas — a skeptical CTO, frustrated client, or cost-obsessed procurement manager. Get comfortable with tough conversations before they happen live.</p>
+        <div class="hero-eyebrow">
+          <div class="hero-dot"></div>
+          <span class="hero-label">Live Training · Oracle Cloud</span>
+        </div>
+        <h1>Practice <em>Discovery</em><br>Before It Counts</h1>
+        <p>Sharpen your discovery skills against four deeply simulated Oracle customers across Energy, Financial Services, Healthcare, and Public Sector — each with real technical environments, internal politics, and trust that must be <em>earned</em> through good questions, not pitches.</p>
+        <div class="hero-badges">
+          <div class="hero-badge">🎙️ Voice + Text</div>
+          <div class="hero-badge">⚡ Energy & Industrial</div>
+          <div class="hero-badge">🏦 Financial Services</div>
+          <div class="hero-badge">🏥 Healthcare</div>
+          <div class="hero-badge">🏛️ Public Sector</div>
+          <div class="hero-badge">📋 Post-Call Coaching</div>
+        </div>
       </div>
     </div>
-
+ 
+    <!-- DISCOVERY SESSION CALLOUT -->
+    <div class="discovery-banner">
+      <div class="discovery-icon">🎯</div>
+      <div>
+        <div class="discovery-title">Built for Discovery Sessions</div>
+        <div class="discovery-text">
+          These aren't pitch practice scenarios — they're discovery sessions. Each customer withholds information until you ask the right questions. They reward good discovery behavior (open-ended questions, active listening, uncovering pain) and penalize premature pitching. The goal is to surface their real blockers, not to demo features they didn't ask about.
+        </div>
+        <div class="discovery-pills">
+          <div class="discovery-pill">Don't pitch early</div>
+          <div class="discovery-pill">Ask before assuming</div>
+          <div class="discovery-pill">Earn each trust level</div>
+          <div class="discovery-pill">Surface buried pain</div>
+          <div class="discovery-pill">Match their technical depth</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- HOW IT WORKS -->
     <div class="sh">How It Works</div>
     <div class="how-grid">
       <div class="how-card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">⚡</span><span class="how-num">00</span></div>
-        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Start the backend</div>
-        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Run <code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:2px">python launcher.py</code> in your terminal. It uses your <code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:2px">~/.oci/config</code> — no API key needed.</div>
+        <div class="how-num">01</div>
+        <div class="how-icon">🎭</div>
+        <div class="how-title">Choose a customer</div>
+        <div class="how-desc">Each persona has a real company, real Oracle environment, and real internal pressure. Read their profile carefully — it tells you what they care about.</div>
       </div>
       <div class="how-card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">🎭</span><span class="how-num">01</span></div>
-        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Choose a persona</div>
-        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Each customer has a distinct personality, challenge level, and OCI-specific concerns.</div>
+        <div class="how-num">02</div>
+        <div class="how-icon">🔍</div>
+        <div class="how-title">Run the discovery</div>
+        <div class="how-desc">Ask open-ended questions. Uncover their environment, pain, and blockers. They won't volunteer everything — you need to draw it out. Avoid pitching OCI until you understand their situation.</div>
       </div>
       <div class="how-card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">🎙️</span><span class="how-num">02</span></div>
-        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Speak or type</div>
-        <div style="font-size:12px;color:var(--text-md);line-height:1.65">Use your mic to respond as you would on a real call. The AI customer replies in real time via OCI Generative AI.</div>
+        <div class="how-num">03</div>
+        <div class="how-icon">🎙️</div>
+        <div class="how-title">Speak or type</div>
+        <div class="how-desc">Use your mic for realism or type your responses. The AI customer replies in character — including pushback, skepticism, and the occasional tangent.</div>
       </div>
       <div class="how-card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">📋</span><span class="how-num">03</span></div>
-        <div style="font-weight:600;font-size:13px;margin-bottom:6px">Review transcript</div>
-        <div style="font-size:12px;color:var(--text-md);line-height:1.65">After ending the session, review the full conversation to identify where you lost the customer.</div>
+        <div class="how-num">04</div>
+        <div class="how-icon">📋</div>
+        <div class="how-title">Get coached</div>
+        <div class="how-desc">After the session, review your transcript and receive AI coaching on your discovery technique — what worked, what didn't, and where you lost or gained trust.</div>
       </div>
     </div>
-
-    <div class="sh">Select Your Customer</div>
-    <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;color:var(--text-mut);font-weight:600;margin-right:4px">Difficulty:</span>
-      <button class="ftab on" data-f="All">All</button>
-      <button class="ftab" data-f="Easy">Easy</button>
-      <button class="ftab" data-f="Medium">Medium</button>
-      <button class="ftab" data-f="Hard">Hard</button>
+ 
+    <!-- PERSONA GRID -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <div class="sh" style="margin-bottom:0;flex:1">Select Your Customer</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:10px;color:var(--text-mut);font-weight:600;letter-spacing:.5px">DIFFICULTY:</span>
+        <button class="ftab on" data-f="All">All</button>
+        <button class="ftab" data-f="Easy">Easy</button>
+        <button class="ftab" data-f="Medium">Medium</button>
+        <button class="ftab" data-f="Hard">Hard</button>
+        <span style="font-size:10px;color:var(--border-md);margin:0 2px">|</span>
+        <span style="font-size:10px;color:var(--text-mut);font-weight:600;letter-spacing:.5px">INDUSTRY:</span>
+        <button class="ftab" data-f="Energy">Energy</button>
+        <button class="ftab" data-f="Financial">Financial</button>
+        <button class="ftab" data-f="Healthcare">Healthcare</button>
+        <button class="ftab" data-f="Public Sector">Gov't</button>
+      </div>
     </div>
     <div class="pgrid" id="pgrid"></div>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+ 
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px">
       <button class="btn btn-red" id="start-btn" disabled>Select a customer to begin</button>
       <span id="sel-lbl" style="font-size:13px;color:var(--text-md);display:none"></span>
     </div>
+ 
   </div>
 </div>
-
+ 
+<!-- ══════════════════════════════════════════════ SESSION ══ -->
 <div id="session-page" class="page">
-    <div id="snav">
-    <div style="display:flex;align-items:center;gap:9px">
-      <div style="display:flex;transform:scale(.72);transform-origin:left center"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
-      <div id="sn-av"    class="av av-sm" style="margin-left:2px"></div>
+  <div id="snav">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo-mark" style="transform:scale(.8);transform-origin:left center">
+        <div class="logo-o">O</div><div class="logo-ci">CI</div>
+      </div>
+      <div id="sn-av" class="av av-sm" style="margin-left:3px"></div>
       <span id="sn-name" style="font-size:13px;font-weight:600"></span>
-      <span id="sn-lbl"  style="font-size:12px;color:var(--text-mut)"></span>
+      <span id="sn-lbl" style="font-size:11px;color:var(--text-mut)"></span>
+      <span id="sn-company" style="font-size:10px;color:var(--text-mut);font-family:var(--mono)"></span>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
       <span id="timer">00:00</span>
       <button class="btn-sm" id="end-btn">End session</button>
     </div>
   </div>
-
+ 
   <div id="sbody">
+    <!-- SIDEBAR -->
     <div id="sidebar">
+ 
+      <!-- Avatar panel -->
       <div id="ppanel">
         <div class="stag">CUSTOMER</div>
         <div style="position:relative;margin:8px 0 12px">
-          <div class="sring"  id="sr1" style="inset:-10px"></div>
-          <div class="sring2" id="sr2" style="inset:-5px"></div>
+          <div class="sring"  id="sr1" style="inset:-12px"></div>
+          <div class="sring2" id="sr2" style="inset:-6px"></div>
           <div id="sp-av" class="av av-md"></div>
         </div>
-        <div id="sp-name"    style="font-weight:700;font-size:12px;text-align:center;color:var(--text);margin-bottom:2px"></div>
-        <div id="sp-lbl"     style="font-size:10px;color:var(--text-md);text-align:center;margin-bottom:2px"></div>
-        <div id="sp-diff"    class="diff" style="margin-bottom:12px"></div>
+        <div id="sp-name" style="font-weight:700;font-size:12px;text-align:center;color:var(--text);margin-bottom:2px"></div>
+        <div id="sp-role" style="font-size:10px;color:var(--text-md);text-align:center;margin-bottom:1px"></div>
+        <div id="sp-company" style="font-size:9px;color:var(--text-mut);text-align:center;font-family:var(--mono);margin-bottom:8px"></div>
+        <div id="sp-diff" class="diff" style="margin-bottom:12px"></div>
         <div id="sp-dots" style="display:none;gap:4px;background:var(--surface);padding:6px 12px;border-radius:14px;border:1px solid var(--border)">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
       </div>
+ 
+      <!-- Notes panel -->
+      <div id="notes-panel">
+        <div style="font-size:9px;font-weight:700;color:var(--text-mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px">
+          <span>📝</span> SE Notes
+        </div>
+        <textarea id="se-notes" placeholder="Jot down what you're hearing…&#10;&#10;• Their environment&#10;• Pain points&#10;• Stakeholders&#10;• Budget signals&#10;• Next steps"></textarea>
+      </div>
+ 
+      <!-- Mode toggle -->
       <div id="mpanel">
         <div style="font-size:9px;font-weight:700;color:var(--text-mut);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Input Mode</div>
         <div style="display:flex;gap:5px">
@@ -295,64 +933,105 @@
         <div id="micerr">Mic unavailable — switch to text mode.</div>
       </div>
     </div>
-
+ 
+    <!-- CHAT -->
     <div id="chat">
       <div id="msgs"></div>
+ 
+      <!-- Discovery hint bar -->
+      <div class="discovery-hint">
+        💡 <strong>Discovery mode:</strong> Ask open questions. Uncover their pain before you pitch. They'll reveal more as trust builds.
+      </div>
+ 
       <div id="ibar">
         <div id="vinput" style="display:flex;flex-direction:column;align-items:center;gap:10px">
           <div id="livetx"></div>
-          <div style="display:flex;align-items:center;gap:14px">
+          <div style="display:flex;align-items:center;gap:16px">
             <button id="micbtn" class="idle"><div class="mring"></div>🎙️</button>
-            <div id="micstat" style="font-size:13px;color:var(--text-mut);line-height:1.5;max-width:260px">Press the mic to speak your response.</div>
+            <div id="micstat" style="font-size:13px;color:var(--text-mut);line-height:1.6;max-width:280px">Press the mic to speak your opening.<br><span style="font-size:11px">Try: <em>"Can you tell me about your current Oracle environment?"</em></span></div>
           </div>
         </div>
         <div id="tinput" style="display:none;gap:9px;align-items:flex-end">
           <textarea id="txt" rows="2" placeholder="Type your response… Enter to send · Shift+Enter for new line"
-            style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:14px;outline:none;resize:none;padding:10px 13px;border-radius:5px;line-height:1.55;transition:border-color .13s;width:100%"></textarea>
-          <button id="send-btn" class="btn btn-red" style="height:58px;padding:0 20px;flex-shrink:0" disabled>Send →</button>
+            style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;outline:none;resize:none;padding:10px 14px;border-radius:6px;line-height:1.6;transition:border-color .13s;width:100%"></textarea>
+          <button id="send-btn" class="btn btn-red" style="height:60px;padding:0 22px;flex-shrink:0" disabled>Send →</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
+ 
+ 
+<!-- ══════════════════════════════════════════════ DEBRIEF ══ -->
 <div id="debrief" class="page">
   <nav>
     <div class="logo">
-      <div style="display:flex"><div class="logo-o">O</div><div class="logo-dot">◉</div></div>
+      <div class="logo-mark"><div class="logo-o">O</div><div class="logo-ci">CI</div></div>
       <div class="logo-text">
-        <div class="logo-title">OCI Voice Trainer</div>
-        <div class="logo-sub">Oracle Cloud Engineer Practice Tool</div>
+        <div class="logo-title">OCI Discovery Trainer</div>
+        <div class="logo-sub">Oracle Cloud · SE Practice Suite</div>
       </div>
     </div>
-    <span id="dtime" style="font-size:12px;color:var(--text-mut)"></span>
+    <span id="dtime" style="font-size:12px;color:var(--text-mut);font-family:var(--mono)"></span>
   </nav>
-  <div style="max-width:720px;margin:0 auto;padding:40px 20px;animation:fadeUp .35s ease">
-    
-    <div style="margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border)">
-      <div class="sh" style="margin-bottom:10px">Session Complete</div>
-      <h2 style="font-family:var(--serif);font-size:32px;font-weight:700;margin-bottom:8px">Call Transcript</h2>
-      <p id="dmeta" style="font-size:13px;color:var(--text-md)"></p>
-    </div>
-
-    <div id="transcript" style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px"></div>
-
-    <div id="coach-loading">✨ Consulting with OCI Coach...</div>
-    <div id="coach-section">
-      <div class="sh" style="margin-bottom:10px">Performance Coaching</div>
-      <div class="coach-card">
-        <div id="coach-content" class="coach-text"></div>
+ 
+  <div id="debrief-body">
+ 
+    <!-- Header banner -->
+    <div class="debrief-header">
+      <div class="debrief-header-inner">
+        <div class="debrief-eyebrow">Oracle SE · Discovery Session Complete</div>
+        <div class="debrief-title">Session Debrief</div>
+        <div class="debrief-meta" id="dmeta"></div>
+      </div>
+      <div class="debrief-timer-badge">
+        <span class="dt-val" id="dtime-val">—</span>
+        <span class="dt-lbl">Duration</span>
       </div>
     </div>
-
-    <div style="display:flex;gap:10px;margin-top:40px">
-      <button class="btn btn-ghost" id="new-btn">← Choose new customer</button>
-      <button class="btn btn-red"   id="restart-btn">↺ Restart session</button>
+ 
+    <!-- Transcript -->
+    <div class="debrief-section-head">
+      <div class="debrief-section-icon dsi-transcript">💬</div>
+      <div class="debrief-section-label">Conversation Transcript</div>
     </div>
+    <div id="transcript" style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px"></div>
+ 
+    <!-- Coach loading -->
+    <div id="coach-loading">
+      <div class="coach-loading-spinner"></div>
+      <div class="coach-loading-text">Reviewing your session and preparing coaching feedback…</div>
+    </div>
+ 
+    <!-- Coach report -->
+    <div id="coach-section">
+      <div class="debrief-section-head">
+        <div class="debrief-section-icon dsi-coach">🏛️</div>
+        <div class="debrief-section-label">OCI Consulting Feedback</div>
+      </div>
+      <div class="coach-report">
+        <div class="coach-report-header">
+          <div class="coach-report-icon">✦</div>
+          <div>
+            <div class="coach-report-title">Discovery Session Analysis</div>
+            <div class="coach-report-subtitle">Prepared by Oracle Cloud Practice · SE Development</div>
+          </div>
+        </div>
+        <div class="coach-report-body">
+          <div id="coach-content" class="coach-text"></div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="debrief-actions">
+      <button class="btn btn-ghost" id="new-btn">← Choose new customer</button>
+      <button class="btn btn-red"   id="restart-btn">↺ Restart with same customer</button>
+    </div>
+ 
   </div>
 </div>
-
-<!-- CUSTOM PERSONA MODAL -->
+ 
+<!-- ══════════════════════════════════════════════ MODAL ══ -->
 <div class="modal-overlay" id="persona-modal">
   <div class="modal">
     <div class="modal-head">
@@ -371,18 +1050,28 @@
         </div>
       </div>
       <div class="fgroup">
-        <label>Persona Description *</label>
-        <textarea id="cp-desc" placeholder="Describe this customer's personality, goals, concerns, and attitude. The more detail you add, the more realistic the roleplay.&#10;&#10;e.g. A cautious IT director at a healthcare company. Concerned about HIPAA compliance and data residency. Has been burned by a failed AWS migration and is highly skeptical of cloud vendors."></textarea>
+        <label>Company (optional)</label>
+        <input type="text" id="cp-company" placeholder="e.g. Acme Manufacturing" maxlength="60"/>
       </div>
       <div class="fgroup">
-        <label>Difficulty</label>
-        <select id="cp-difficulty">
-          <option value="Easy">Easy</option>
-          <option value="Medium" selected>Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
+        <label>Persona Description *</label>
+        <textarea id="cp-desc" placeholder="Describe this customer's personality, Oracle environment, concerns, and attitude. The more detail, the more realistic the discovery session.&#10;&#10;e.g. A cautious DBA at a healthcare company running Oracle 19c on-prem. Concerned about HIPAA compliance and data residency. Has been burned by a failed cloud migration and is highly skeptical. Will warm up if you match their technical depth."></textarea>
       </div>
-      <div id="cp-err" style="display:none;background:var(--red-light);border:1px solid var(--red-mid);color:var(--red-dark);border-radius:5px;padding:8px 12px;font-size:12px;margin-bottom:8px"></div>
+      <div class="frow2">
+        <div class="fgroup">
+          <label>Difficulty</label>
+          <select id="cp-difficulty">
+            <option value="Easy">Easy</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Key Concerns (comma-separated)</label>
+          <input type="text" id="cp-tags" placeholder="licensing, performance, HIPAA"/>
+        </div>
+      </div>
+      <div id="cp-err" style="display:none;background:var(--red-light);border:1px solid var(--red-mid);color:var(--red-dark);border-radius:6px;padding:9px 13px;font-size:12px;margin-bottom:10px"></div>
       <div class="modal-foot">
         <button class="btn btn-ghost" id="modal-cancel-btn">Cancel</button>
         <button class="btn btn-red"   id="modal-save-btn">Add Persona →</button>
@@ -390,314 +1079,407 @@
     </div>
   </div>
 </div>
-
+ 
 <script>
-// ... (Your existing PERSONAS, config, and state) ...
+// ════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════
 const BACKEND  = "/chat";
+const FEEDBACK = "/feedback";
+const TTS_RATE = 1.1;
+ 
+// ════════════════════════════════════════════════════════
+// PERSONAS — real Oracle customers, discovery-tuned
+// ════════════════════════════════════════════════════════
 const PERSONAS = [
-  { id:"1", name:"Dave",   label:"Senior Oracle DBA",    avatar:"DV", difficulty:"Hard",
-    voice_id:0, ssml_rate:"medium",   ssml_pitch:"low",
-    desc: "A Senior Oracle DBA with 18 years experience. Skeptical of cloud, worried about RAC performance vs ExaCS, and extremely focused on SYSDBA access and licensing gotchas." },
-  { id:"2", name:"Priya",  label:"Solutions Architect",  avatar:"PY", difficulty:"Medium",
-    voice_id:1, ssml_rate:"medium", ssml_pitch:"medium",
-    desc: "Healthcare architect focused on hybrid cloud strategies. Asks pointed questions about HL7/FHIR integrations, FastConnect vs VPN, and HIPAA BAA coverage." },
-  { id:"3", name:"Marcus", label:"Frustrated Lead DBA",  avatar:"MC", difficulty:"Hard",
-    voice_id:0, ssml_rate:"fast",   ssml_pitch:"low",
-    desc: "In the middle of a turbulent migration. Dealing with ZDM bugs, TDE-encryption issues, and performance regressions on Block Volumes. Wants documentation, not sales talk." },
-  { id:"4", name:"Linda",  label:"Enterprise Architect", avatar:"LD", difficulty:"Medium",
-    voice_id:1, ssml_rate:"medium",   ssml_pitch:"medium",
-    desc: "A license audit survivor. Views OCI through a compliance lens. Focused on ULA applicability, OCPU counting, and Oracle's audit rights in cloud environments." },
+  {
+    id: "1",
+    name: "Danny Brewer",
+    label: "IT Manager",
+    company: "Lone Star Energy Services",
+    avatar: "DB",
+    difficulty: "Easy",
+    location: "Midland, TX",
+    industry: "Energy / Utilities / Industrial",
+    summary: "Danny is a practical, no-nonsense IT Manager at a West Texas oilfield services company. He inherited JDE and Oracle three years ago and manages it with the help of a local Oracle partner. He speaks plain English, uses oilfield shorthand, and will tell you straight up when he's confused. His VP heard Oracle Cloud mentioned at a conference and asked him to investigate — so here he is. He's open, cooperative, and just wants answers he can bring back to Carol.",
+    env: ["JDE 9.2 on Oracle 19c SE2 (420GB)", "Single server in Midland colo", "RMAN → NAS backup (weekly tape skipped)", "Oracle APEX for HSE incident capture"],
+    concerns: ["Field connectivity — JDE on VPN times out on rigs", "Backup posture — NAS in same rack, tape often skipped", "Scaling for 2 incoming contracts (+200 users)", "Cost flexibility when rig count drops"],
+    trustHints: ["Keep it plain — he's not a DBA", "Address field access first — that's Carol's ask", "Translate every acronym before using it", "Acknowledge boom/bust cost sensitivity"],
+    systemDesc: `You are Danny Brewer, a 41-year-old IT Manager at Lone Star Energy Services in Midland, Texas. Lone Star is an oilfield services company — completions, production support, some offshore Gulf work — about 1,100 employees, $520M revenue. You are not a database administrator. You inherited Oracle responsibility 3 years ago when Lone Star went live on JD Edwards EnterpriseOne 9.2. Your Oracle partner (West Texas Tech Solutions) handles the technical DB work. You are here because your VP Carol Whitfield heard Oracle Cloud mentioned at the DUG Permian conference and asked you to find out if it makes sense for Lone Star. You are genuinely curious and have no agenda. You speak plainly — you use oilfield shorthand naturally ("our completions guys," "when the rig count dropped in 2020") and you will say "I'm sorry, can you explain what that means?" when you don't understand something. Your real problems: (1) field supervisors on Starlink or LTE in the Delaware Basin can't reliably access JDE over VPN — it times out constantly, and three of them have complained formally; (2) your RMAN backup goes to a NAS in the same rack as the server, and the weekly manual tape copy to your partner's office gets skipped sometimes; (3) two new contracts would add 200 field users in 90 days and you're not sure your single server can handle it; (4) Carol wants anything you recommend to flex down if the rig count drops — fixed costs are dangerous in the energy business and you went through 2020. You warm up quickly when the SE addresses field access. You lose engagement when jargon isn't explained. If the SE says migration is "straightforward" you mention your rocky JDE go-live. You want to give Carol a clear answer — that's your goal for this call.`
+  },
+  {
+    id: "2",
+    name: "Serena Walsh",
+    label: "VP of Technology",
+    company: "Harborview Capital Group",
+    avatar: "SW",
+    difficulty: "Medium",
+    location: "Boston, MA",
+    industry: "Financial Services",
+    summary: "Serena is a polished, experienced technology executive at a $42B wealth management firm. She has 18 years in financial services IT and runs meetings efficiently. She already has OAC deployed in OCI — her first cloud footprint — and describes the experience as 'adequate, not impressive yet.' Her data center lease expires in 22 months and her COO wants an evaluation. She's not hostile but she's heard vendor pitches before and has a sharp radar for when someone is telling her what she wants to hear rather than what's true.",
+    env: ["4× Oracle 19c EE DBs (client data, portfolio analytics, compliance, OMS)", "OAC already in OCI — 12-14s load times vs 8s on-prem", "15-min RPO / 4-hr RTO in BCP", "Data center lease expires in 22 months"],
+    concerns: ["SEC Rule 17a-4 WORM storage for ComplianceDB", "4-hr RTO / 15-min RPO regulatory commitment", "Nightly settlement batch — 4 failures in 12 months", "FINRA exam Q2 — won't tolerate mid-migration audit risk"],
+    trustHints: ["Know what SEC 17a-4 is before she asks", "Acknowledge the batch failure as an infrastructure problem", "Address FINRA exam timeline directly and specifically", "Don't gloss over Charles River IMS — she expects you to know it"],
+    systemDesc: `You are Serena Walsh, a 46-year-old VP of Technology at Harborview Capital Group in Boston, Massachusetts. Harborview manages $42 billion in assets — primarily high-net-worth individual wealth management. You have 18 years in financial services technology. You are polished, prepared, and have a finely tuned radar for when someone is telling you what you want to hear. You are not hostile but you are not easily impressed. Your forcing function: your Boston Equinix data center lease expires in 22 months and COO Patrick Nguyen has asked you to evaluate whether some workloads can move to OCI. You already have Oracle Analytics Cloud (OAC) running in OCI — it's your first cloud footprint and the experience has been adequate but not impressive (report load times are 12-14 seconds vs 8 seconds on-prem, and you suspect the IPSec VPN is the culprit but haven't confirmed it). Your nightly settlement reconciliation batch runs 2am-5am and has failed 4 times in 12 months from connectivity issues — this triggers 6am phone calls and you are done tolerating it. Key constraints: (1) SEC Rule 17a-4 requires WORM (non-rewriteable, non-erasable) storage for ComplianceDB trade records — your CCO Sandra Park will not approve any ComplianceDB migration without documented OCI WORM compliance; (2) your BCP commits to 4-hour RTO and 15-minute RPO for ClientDataDB — these are regulatory commitments, not preferences; (3) FINRA technology examination is scheduled for Q2 next year — you will not start a migration that leaves you mid-flight during the exam; (4) Charles River IMS (your order management system) is on Oracle 19c EE — any migration requires Charles River's sign-off. You use financial services terminology naturally (17a-4, FINRA exam, BCP, settlement batch, custodial reconciliation). If the SE doesn't know what 17a-4 is, your confidence drops visibly. If they dismiss the FINRA exam concern, you correct them firmly. You warm up when the SE shows financial services literacy and gives specific rather than general answers.`
+  },
+  {
+    id: "3",
+    name: "Dr. Kenji Mori",
+    label: "Director of Clinical Informatics",
+    company: "Cascadia Regional Health",
+    avatar: "KM",
+    difficulty: "Hard",
+    location: "Portland, OR",
+    industry: "Healthcare",
+    summary: "Dr. Mori is a former physician who transitioned to clinical informatics after a fellowship at OHSU. He speaks both clinical and technical language fluently, which makes him harder to hand-wave than most healthcare buyers. He is measured, precise, and quiet when he's not getting specific answers — which is more unsettling than anger. He already has OIC and OAC running in OCI and has specific unanswered questions about both. His CISO, his CTO, and Epic all have veto power over different parts of any technology decision he makes.",
+    env: ["CLARITY_DB 6.2TB + ClinicalDW 9.1TB on Exadata X7-2", "OIC + OAC in OCI production (PHI-bearing)", "PCORnet CDM (NIH grant-funded)", "Exadata Premier Support ends in 14 months"],
+    concerns: ["OIC PHI payload persistence — CISO waiting on documented answer", "Immutable backups against ransomware / admin-credential threat", "Exadata renewal vs ExaCS — $2.8M capital decision", "Epic certification for OCI — has not confirmed yet"],
+    trustHints: ["Know the difference between CLARITY and Chronicles", "Address OIC PHI persistence specifically — not just 'HIPAA compliant'", "Immutability means admin-credential-proof, not just backups", "Acknowledge the Epic certification as a real dependency, not a formality"],
+    systemDesc: `You are Dr. Kenji Mori, a 48-year-old Director of Clinical Informatics at Cascadia Regional Health in Portland, Oregon — a regional health system with 6 hospitals, 34 clinics, about 11,000 employees. You trained as an internal medicine physician (MD, University of Washington), practiced for 6 years, then transitioned to clinical informatics. You speak both clinical language (ICD-10, HEDIS, MACRA/MIPS, CMS Core Measures, ACO REACH) and technology language (database schemas, HL7, FHIR R4, Oracle CLARITY). This makes you harder to hand-wave than most healthcare buyers. You are measured and precise. When you are not getting specific enough answers, you go quiet and deliberate, then say "I'm going to come back to that." You do not get angry. Your open issues: (1) You have an unanswered question about OIC: when PHI payload data flows through an OIC integration flow, is it persisted anywhere in Oracle's infrastructure, and if so where, for how long, under whose access controls? Your CISO Rebecca Chen is waiting for a documented answer before she'll approve further OIC expansion. (2) Rebecca has mandated immutable backups — specifically backups that cannot be deleted or encrypted even by an attacker with admin credentials in OCI — following a 2023 ransomware event at a neighboring Oregon health system. Generic backup answers do not satisfy this. (3) Your ClinicalDW runs on Exadata X7-2 with Premier Support ending in 14 months. Your VP Brian wants a capital vs. cloud comparison (Exadata X9M hardware refresh vs OCI ExaCS) by Q3. (4) Any change to CLARITY_DB must be validated by Epic Technical Services — this is a real blocking dependency you will flag upfront. You have NOT confirmed whether ExaCS is on Epic's certified environment list. Your HIPAA BAA question is: which OCI services are specifically covered — OIC, OAC, DBCS, Autonomous Database, ExaCS? You need service-by-service confirmation.`
+  },
+  {
+    id: "4",
+    name: "Angela Osei",
+    label: "Deputy CIO",
+    company: "City of Glenrock",
+    avatar: "AO",
+    difficulty: "Medium",
+    location: "Glenrock, CO",
+    industry: "Public Sector / Government",
+    summary: "Angela is a career public sector IT leader who has spent her entire career in Colorado government — CDOT, Arapahoe County, and now the City of Glenrock. She is practical, budget-disciplined, and politically aware. Every decision she makes is potentially subject to a public records request and city council scrutiny, and she documents everything accordingly. She is not an Oracle expert but she asks the right questions. Her data center UPS is past its replacement cycle, residents are complaining about the Oracle Forms permitting system on mobile, and the Police Chief won't let his database move without CJIS documentation.",
+    env: ["PeopleSoft 9.2 on Oracle 19c EE (900GB)", "Oracle Forms 12c permitting system (resident-facing)", "PoliceDept_DB — CJIS-protected data", "Aging City Hall data center, UPS past replacement cycle"],
+    concerns: ["NASPO ValuePoint procurement — can't do standalone RFP easily", "PeopleSoft roadmap honesty — Fusion Cloud or stay?", "CJIS Security Addendum for Police Department data", "Oracle Forms 12c end-of-support + APEX rewrite reality"],
+    trustHints: ["Know what NASPO ValuePoint is — it's the first question", "Give the honest PeopleSoft answer, not the corporate one", "CJIS is non-negotiable for the Police Chief", "Acknowledge the public-sector complexity of Forms modernization"],
+    systemDesc: `You are Angela Osei, a 44-year-old Deputy CIO for the City of Glenrock, Colorado — a suburban municipality of about 180,000 residents in the Denver metro area. You have spent your entire career in public sector IT (CDOT, Arapahoe County, now Glenrock). You are practical, budget-disciplined, and politically aware. Every technology decision you make is potentially subject to a Colorado Open Records Act request and city council scrutiny. You document everything. Your forcing function for this call: your City Hall data center UPS systems are past their replacement cycle — the capital request is in council review — and CIO Michael Tran has asked you to evaluate OCI as a way to reduce data center dependency. Your environment: (1) PeopleSoft Financials 9.2 on Oracle Database 19c EE (900GB) — GL, AP, AR, Purchasing, Payroll, Grants — your primary system; (2) a custom permitting system on Oracle Forms 12c and Oracle Database 19c SE2 that is generating resident complaints because it doesn't work on mobile; (3) PoliceDept_DB on Oracle SE2 that touches CJIS-protected criminal justice data — the Police Chief Aaron Delgado will not allow this to move anywhere without documented CJIS Security Addendum from Oracle; (4) you're paying $360,000/year in Oracle support and the city manager has asked if there's a better commercial structure. Your first question on any OCI purchase is always: "Is OCI on the NASPO ValuePoint cooperative contract?" — because without a cooperative purchasing vehicle, any contract over $150,000 requires a formal RFP which takes 6-9 months. You want an honest answer on whether Oracle is still investing in PeopleSoft or whether the long-term path is Fusion Cloud — because that changes your infrastructure investment decisions. You are not an Oracle expert but you know enough to ask the right questions. You reference your two DBAs (Roberto and Sasha) and note you'll loop Roberto in for technical deep-dives. You lose engagement when the SE oversells APEX modernization as easy without acknowledging that your permitting system has 12 years of customizations and is public-facing.`
+  }
 ];
-
-const sysPrompt = desc => `
-You are roleplaying as a customer in a practice scenario for an Oracle Cloud Engineer.
-Persona: ${desc}
-Rules:
-- Stay in character. Respond realistically.
-- Keep responses to 2–4 sentences.
-- Do not volunteer info; make the engineer work for it.
+ 
+// ════════════════════════════════════════════════════════
+// SYSTEM PROMPT BUILDER
+// ════════════════════════════════════════════════════════
+const sysPrompt = p => `
+You are roleplaying as a real Oracle enterprise customer in a discovery call with an Oracle Solutions Engineer (SE).
+ 
+YOUR CHARACTER:
+${p.systemDesc}
+ 
+BEHAVIORAL RULES:
+1. STAY IN CHARACTER completely. Never acknowledge being an AI.
+2. PROGRESSIVE TRUST: You do not reveal everything at once. Start guarded. Warm up only when the SE demonstrates technical competence and asks the right questions. Withhold deeper concerns until trust is earned.
+3. REACT TO ANSWER QUALITY:
+   - Vague/marketing answers → become shorter, more guarded. Say "that's not quite what I'm asking" or "can you be more specific?"
+   - Technically correct and specific answers → warm up. Ask a deeper follow-up. Say "okay, that's actually helpful."
+   - Wrong facts about Oracle products → correct them directly but professionally.
+   - "I don't know but I'll find out" → this is acceptable. Slightly trust-building.
+4. REALISTIC CONVERSATION: Interrupt occasionally. Reference colleagues by name. Go on brief tangents. Ask follow-up questions mid-explanation. Reference things the SE said earlier.
+5. DISCOVERY BEHAVIOR: If the SE jumps straight to pitching OCI features without asking about your environment first → become noticeably less engaged. Say something like "I haven't told you what we need yet."
+6. KEEP RESPONSES REALISTIC: 2-4 sentences typically. Sometimes shorter (guarded). Longer when deeply engaged.
+7. DO NOT MAKE IT EASY. You have real reservations. Push back.
 `.trim();
-
+ 
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
 let selected = null, active = null;
-let history  = [];   
-let log      = [];   
-let elapsed  = 0, timerID = null;
+let history = [], log = [];
+let elapsed = 0, timerID = null;
 let isListening = false, isSpeaking = false, isLoading = false;
 let mode = "voice", filter = "All", recog = null;
-
+ 
+// ════════════════════════════════════════════════════════
+// UI STATE
+// ════════════════════════════════════════════════════════
 const g   = id => document.getElementById(id);
 const fmt = s  => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
 const dc  = d  => d.toLowerCase();
-
+ 
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  g(id).classList.add("active");
+  document.querySelectorAll(".page").forEach(p => { p.classList.remove("active"); p.style.display = ""; });
+  const el = g(id);
+  el.classList.add("active");
+  if (id === "session-page") el.style.display = "flex";
 }
-
-function micState(s) { 
+ 
+// ════════════════════════════════════════════════════════
+// UI STATE
+// ════════════════════════════════════════════════════════
+function micState(s) {
   const b = g("micbtn");
   b.className = s;
-  b.innerHTML = `<div class="mring"></div>${s==="live" ? "⏹" : "🎙️"}`;
+  b.innerHTML = `<div class="mring"></div>${s === "live" ? "⏹" : "🎙️"}`;
   b.disabled  = s === "busy";
 }
-
+ 
 function setSpeaking(on) {
   isSpeaking = on;
   g("sr1").style.display = g("sr2").style.display = on ? "block" : "none";
   g("sp-dots").style.display = on ? "flex" : "none";
   g("sp-av").style.borderColor = on ? "var(--red)" : "var(--red-mid)";
   updateStat();
-  micState(isLoading||on ? "busy" : isListening ? "live" : "idle");
+  micState(isLoading || on ? "busy" : isListening ? "live" : "idle");
 }
-
+ 
 function updateStat() {
   const el = g("micstat");
-  if (isListening)     el.innerHTML = `<strong style="color:var(--red)">Listening…</strong> Click stop when done.`;
-  else if (isLoading)  el.textContent = "Processing…";
-  else if (isSpeaking) el.textContent = `${active.name} is speaking…`;
-  else                 el.textContent = "Press the mic to speak your response.";
+  if (isListening)      el.innerHTML = `<strong style="color:var(--red)">Listening…</strong> Click stop when done.`;
+  else if (isLoading)   el.textContent = "Processing…";
+  else if (isSpeaking)  el.textContent = `${active.name} is speaking…`;
+  else el.innerHTML = `Press the mic to speak your response.<br><span style="font-size:11px">Try: <em>"Can you tell me about your current environment?"</em></span>`;
 }
-
-// ── Custom Personas (persisted in localStorage) ──────────────────
-const CUSTOM_KEY = "oci_custom_personas";
-
-function loadCustomPersonas() {
-  try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); }
-  catch { return []; }
-}
-
-function saveCustomPersonas(list) {
-  localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
-}
-
-function allPersonas() {
-  return [...PERSONAS, ...loadCustomPersonas()];
-}
-
+ 
+// ════════════════════════════════════════════════════════
+// CUSTOM PERSONAS (localStorage)
+// ════════════════════════════════════════════════════════
+const CUSTOM_KEY = "oci_custom_personas_v2";
+const loadCustom = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); } catch { return []; } };
+const saveCustom = list => localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
+const allPersonas = () => [...PERSONAS, ...loadCustom()];
+ 
+// ════════════════════════════════════════════════════════
+// RENDER PERSONA GRID
+// ════════════════════════════════════════════════════════
 function renderGrid() {
   const grid = g("pgrid");
   grid.innerHTML = "";
-  const list = filter === "All" ? allPersonas() : allPersonas().filter(p => p.difficulty === filter);
-
+  const list = filter === "All"
+    ? allPersonas()
+    : allPersonas().filter(p => {
+        if (["Easy","Medium","Hard"].includes(filter)) return p.difficulty === filter;
+        // Industry filter — partial match on the industry string
+        return (p.industry || "").toLowerCase().includes(filter.toLowerCase());
+      });
+ 
   list.forEach(p => {
     const sel = selected?.id === p.id;
     const isCustom = !!p.custom;
     const c = document.createElement("div");
-    c.className = `pcard${sel?" sel":""}${isCustom?" pcard-custom":""}`;
+    c.className = `pcard${sel ? " sel" : ""}${isCustom ? " pcard-custom" : ""}`;
+ 
+    const industryKey = !p.industry ? "custom"
+      : p.custom ? "custom"
+      : p.industry.toLowerCase().includes("energy") ? "energy"
+      : p.industry.toLowerCase().includes("financial") ? "financial"
+      : p.industry.toLowerCase().includes("health") ? "healthcare"
+      : p.industry.toLowerCase().includes("public") ? "public"
+      : "custom";
+ 
+    c.setAttribute("data-industry", industryKey);
+ 
+    const industryBadge = p.industry
+      ? `<div class="pcard-industry">${p.industry}</div>`
+      : "";
+ 
     c.innerHTML = `
       <div class="pcard-stripe"></div>
       <div class="pcard-check">✓</div>
-      ${isCustom ? `<button class="pcard-del" title="Delete persona">✕ Remove</button>` : ""}
-      <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px">
-        <div class="av av-lg" style="${isCustom?"background:var(--bg-deep);border-color:var(--border-md)":""}">${p.avatar}</div>
-        <div>
-          <div style="font-weight:700;font-size:13px">${p.name}</div>
-          <div style="font-size:11px;color:var(--text-md);margin-top:1px">${p.label}</div>
+      ${isCustom ? `<button class="pcard-del" title="Remove">✕</button>` : ""}
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+        <div class="av av-lg">${p.avatar}</div>
+        <div style="flex:1;min-width:0">
+          <div class="pcard-name">${p.name}</div>
+          <div class="pcard-role">${p.label}</div>
+          <div class="pcard-company">${p.company || (isCustom ? "Custom" : "")}</div>
+          ${industryBadge}
         </div>
       </div>
-      <div style="font-size:12px;color:var(--text-md);line-height:1.6;margin-bottom:13px">${p.desc}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bg-deep);padding-top:10px">
-        <span style="font-size:9px;color:var(--text-mut);font-weight:600;letter-spacing:.3px">${isCustom?"CUSTOM":""}</span>
+      ${p.summary ? `<div class="pcard-summary">${p.summary}</div>` : ""}
+      <div class="pcard-footer" style="border-top:1px solid var(--bg-deep);padding-top:12px;display:flex;justify-content:space-between;align-items:center">
         <span class="diff ${dc(p.difficulty)}">${p.difficulty}</span>
+        <span style="font-size:10px;color:var(--text-mut)">${p.location || ""}</span>
       </div>`;
-    // Delete button (stop propagation so it doesn't select)
-    if (isCustom) {
-      c.querySelector(".pcard-del").onclick = e => { e.stopPropagation(); deleteCustomPersona(p.id); };
-    }
+ 
+    if (isCustom) c.querySelector(".pcard-del").onclick = e => { e.stopPropagation(); deleteCustom(p.id); };
     c.onclick = () => pickPersona(p);
     grid.appendChild(c);
   });
-
-  // Always append the "Add Custom" card at the end
+ 
+  // Add custom card
   const add = document.createElement("div");
   add.className = "pcard pcard-add";
-  add.title = "Create a custom customer persona";
   add.innerHTML = `
     <div class="add-icon"><span>＋</span></div>
     <div style="font-size:13px;font-weight:600;color:var(--text-md)">Add Custom Persona</div>
-    <div style="font-size:11px;color:var(--text-mut);text-align:center;line-height:1.5;max-width:160px">Design your own customer with a custom scenario</div>`;
+    <div style="font-size:11px;color:var(--text-mut);text-align:center;line-height:1.5;max-width:160px">Design your own discovery customer</div>`;
   add.onclick = openModal;
   grid.appendChild(add);
 }
-
-function deleteCustomPersona(id) {
-  const list = loadCustomPersonas().filter(p => p.id !== id);
-  saveCustomPersonas(list);
-  if (selected?.id === id) {
-    selected = null;
-    g("start-btn").disabled = true;
-    g("start-btn").textContent = "Select a customer to begin";
-    g("sel-lbl").style.display = "none";
-  }
+ 
+function deleteCustom(id) {
+  const list = loadCustom().filter(p => p.id !== id);
+  saveCustom(list);
+  if (selected?.id === id) { selected = null; g("start-btn").disabled = true; g("start-btn").textContent = "Select a customer to begin"; g("sel-lbl").style.display = "none"; }
   renderGrid();
 }
-
-// ── Custom Persona Modal ──────────────────────────────────────────
-function openModal() {
-  ["cp-name","cp-label","cp-desc"].forEach(id => g(id).value = "");
-  g("cp-difficulty").value = "Medium";
-  g("cp-err").style.display = "none";
-  g("persona-modal").classList.add("open");
-  setTimeout(() => g("cp-name").focus(), 80);
-}
-
-function closeModal() {
-  g("persona-modal").classList.remove("open");
-}
-
-function saveCustomPersona() {
-  const name  = g("cp-name").value.trim();
-  const label = g("cp-label").value.trim();
-  const desc  = g("cp-desc").value.trim();
-  const err   = g("cp-err");
-
-  if (!name || !label || !desc) {
-    err.textContent = "Please fill in Name, Role, and Description.";
-    err.style.display = "block"; return;
-  }
-  err.style.display = "none";
-
-  const initials = name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2) ||
-                   name.slice(0,2).toUpperCase();
-  const id = "custom_" + Date.now();
-  const persona = {
-    id, name, label,
-    avatar:     initials,
-    difficulty: g("cp-difficulty").value,
-    desc,
-    custom:     true
-  };
-
-  const list = loadCustomPersonas();
-  list.push(persona);
-  saveCustomPersonas(list);
-  closeModal();
-  renderGrid();
-  // Auto-select the newly created persona
-  pickPersona(persona);
-}
-
+ 
 function pickPersona(p) {
   selected = p; renderGrid();
   g("start-btn").disabled = false;
-  g("start-btn").textContent = `Start session with ${p.name} →`;
-  const lbl = g("sel-lbl");
-  lbl.style.display = "inline";
+  g("start-btn").textContent = `Start discovery with ${p.name} →`;
+  g("sel-lbl").style.display = "inline";
+  g("sel-lbl").textContent = `${p.name} · ${p.label} · ${p.company || ""}${p.industry ? " · " + p.industry : ""}`;
 }
-
+ 
+// ════════════════════════════════════════════════════════
+// SESSION
+// ════════════════════════════════════════════════════════
 function startSession() {
   active = selected;
-  history = [
-    { role:"USER",      text: sysPrompt(active.desc) },
-    { role:"ASSISTANT", text: "Ready." }
-  ];
+  history = [{ role: "USER", text: sysPrompt(active) }, { role: "ASSISTANT", text: "Ready." }];
   log = []; elapsed = 0;
   isListening = isSpeaking = isLoading = false;
-
+ 
+  // Nav bar
   g("sn-av").textContent      = active.avatar;
   g("sn-name").textContent    = active.name;
   g("sn-lbl").textContent     = `· ${active.label}`;
+  g("sn-company").textContent = active.company ? `· ${active.company}` : "";
+ 
+  // Sidebar persona panel
   g("sp-av").textContent      = active.avatar;
   g("sp-name").textContent    = active.name;
-  g("sp-lbl").textContent     = active.label;
-  const db = g("sp-diff");
-  db.className = `diff ${dc(active.difficulty)}`; db.textContent = active.difficulty;
-
+  g("sp-role").textContent    = active.label;
+  g("sp-company").textContent = (active.company || "") + (active.industry ? " · " + active.industry : "");
+  const db = g("sp-diff"); db.className = `diff ${dc(active.difficulty)}`; db.textContent = active.difficulty;
+ 
+  // Clear SE notes
+  g("se-notes").value = "";
+ 
   setSpeaking(false); micState("idle"); setMode("voice");
-
+ 
   g("msgs").innerHTML = `
     <div class="empty">
       <div class="emav">${active.avatar}</div>
       <strong style="color:var(--text);font-size:14px">${active.name}</strong> is on the line.<br>
-      <span style="font-size:12px" id="ehint">Press the mic button and speak your opening.</span>
+      <span style="font-size:12px;color:var(--text-md)">
+        ${active.label}${active.company ? " · " + active.company : ""}
+      </span><br>
+      ${active.industry ? `<span style="font-size:11px;color:var(--text-mut);letter-spacing:.5px;text-transform:uppercase;font-weight:600">${active.industry}</span><br>` : ""}
+      <br>
+      <span style="font-size:12px">
+        Start with an open question to uncover their environment.<br>
+        <em style="color:var(--text-mut)">"Can you tell me a bit about your current Oracle setup?"</em>
+      </span>
     </div>`;
-
+ 
   clearInterval(timerID);
   g("timer").textContent = "00:00";
   timerID = setInterval(() => { elapsed++; g("timer").textContent = fmt(elapsed); }, 1000);
   showPage("session-page");
 }
-
+ 
+// ════════════════════════════════════════════════════════
+// MESSAGING
+// ════════════════════════════════════════════════════════
 function addMsg(role, text) {
   document.querySelector(".empty")?.remove();
   const msgs = g("msgs");
   const row = document.createElement("div");
-  row.className = `mrow${role==="user"?" u":""}`;
-  if (role==="bot") {
+  row.className = `mrow${role === "user" ? " u" : ""}`;
+  if (role === "bot") {
     const av = document.createElement("div");
-    av.className="av av-sm"; av.textContent=active.avatar;
+    av.className = "av av-sm"; av.textContent = active.avatar;
     row.appendChild(av);
   }
+  const wrapper = document.createElement("div");
   const b = document.createElement("div");
-  b.className = `bbl ${role==="user"?"u":"b"}`; b.textContent = text;
-  row.appendChild(b);
+  b.className = `bbl ${role === "user" ? "u" : "b"}`; b.textContent = text;
+  const meta = document.createElement("div");
+  meta.className = "msg-meta";
+  meta.textContent = role === "user" ? "You" : active.name;
+  wrapper.appendChild(b); wrapper.appendChild(meta);
+  row.appendChild(wrapper);
   msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
 }
-
+ 
 function showTyping() {
   g("typing")?.remove();
   const msgs = g("msgs");
-  const r = document.createElement("div");
-  r.id="typing"; r.className="mrow";
-  r.innerHTML=`<div class="av av-sm">${active.avatar}</div>
+  const r = document.createElement("div"); r.id = "typing"; r.className = "mrow";
+  r.innerHTML = `<div class="av av-sm">${active.avatar}</div>
     <div class="bbl b" style="padding:11px 16px;display:flex;gap:5px">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
   msgs.appendChild(r); msgs.scrollTop = msgs.scrollHeight;
 }
-
+ 
 async function callBackend(userText) {
-  history.push({ role:"USER", text:userText });
-  const res = await fetch(BACKEND, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      history,
-      voice_id: active.voice_id   ?? 0,
-      rate:     active.ssml_rate  ?? "medium",
-      pitch:    active.ssml_pitch ?? "low",
-    })
-  });
+  history.push({ role: "USER", text: userText });
+  const res = await fetch(BACKEND, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ history }) });
   const data = await res.json();
-  history.push({ role:"ASSISTANT", text:data.reply });
-  return data; // { reply, audio }
+  history.push({ role: "ASSISTANT", text: data.reply });
+  return data.reply;
 }
-
-function playAudio(b64, cb) {
-  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  const url   = URL.createObjectURL(new Blob([bytes], { type:"audio/mpeg" }));
-  const el    = new Audio(url);
-  el.onended  = () => { URL.revokeObjectURL(url); cb?.(); };
-  el.play();
+ 
+function tts(text, cb) {
+  if (!window.speechSynthesis) { cb?.(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = TTS_RATE;
+  u.pitch = active?.voice_id === 1 ? 1.15 : 0.95;
+  u.onend = cb;
+  speechSynthesis.speak(u);
 }
-
+ 
 async function handleMsg(text) {
   if (!text.trim() || isLoading || isSpeaking) return;
-  log.push({role:"user", text}); addMsg("user", text);
+  log.push({ role: "user", text }); addMsg("user", text);
   isLoading = true; micState("busy"); updateStat(); showTyping();
   try {
-    const { reply, audio } = await callBackend(text);
-    log.push({role:"bot", text:reply});
+    const reply = await callBackend(text);
+    log.push({ role: "bot", text: reply });
     g("typing")?.remove(); addMsg("bot", reply);
     setSpeaking(true);
-    playAudio(audio, () => { setSpeaking(false); micState("idle"); updateStat(); });
-  } catch(err) {
-    g("typing")?.remove();
-    addMsg("bot", "[Error connecting to backend]");
+    tts(reply, () => { setSpeaking(false); micState("idle"); updateStat(); });
+  } catch (err) {
+    g("typing")?.remove(); addMsg("bot", "[Error connecting to backend]");
   } finally {
     isLoading = false;
     if (!isSpeaking) { micState("idle"); updateStat(); }
   }
 }
-
+ 
+// ════════════════════════════════════════════════════════
+// END SESSION + DEBRIEF
+// ════════════════════════════════════════════════════════
+function endSession() {
+  clearInterval(timerID); stopListening();
+  const timeStr = fmt(elapsed);
+  g("dtime").textContent = `Session complete · ${timeStr}`;
+  g("dtime-val").textContent = timeStr;
+  g("dmeta").innerHTML = `<strong>${active.name}</strong> · ${active.label}${active.company ? ", " + active.company : ""}${active.industry ? " · " + active.industry : ""}`;
+ 
+  const tr = g("transcript");
+  tr.innerHTML = log.length === 0 ? "<p style='color:var(--text-mut);font-size:14px'>No messages exchanged.</p>" : "";
+  log.forEach(m => {
+    const isu = m.role === "user";
+    const r = document.createElement("div"); r.className = "trow";
+    r.innerHTML = `
+      <div class="av av-sm" style="background:${isu ? "var(--red)" : "var(--red-light)"};border:${isu ? "none" : "1.5px solid var(--red-mid)"};color:${isu ? "#fff" : "var(--red)"}">${isu ? "YOU" : active.avatar}</div>
+      <div style="flex:1">
+        <div class="tlabel">${isu ? "You (SE)" : active.name}</div>
+        <div class="tbbl">${m.text}</div>
+      </div>`;
+    tr.appendChild(r);
+  });
+ 
+  showPage("debrief");
+  if (log.length > 0) getFeedback();
+}
+ 
 async function getFeedback() {
   g("coach-section").style.display = "none";
-  g("coach-loading").style.display = "block";
+  g("coach-loading").style.display = "flex";
   try {
-    const res = await fetch("/feedback", {
+    const res = await fetch(FEEDBACK, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ history: history, persona_name: active.name })
+      body: JSON.stringify({
+        history,
+        persona_name: active.name,
+        persona_role: active.label,
+        persona_industry: active.industry || "",
+        session_type: "discovery"
+      })
     });
     const data = await res.json();
     g("coach-content").textContent = data.feedback;
@@ -705,80 +1487,108 @@ async function getFeedback() {
   } catch (err) { console.error(err); }
   finally { g("coach-loading").style.display = "none"; }
 }
-
-function endSession() {
-  clearInterval(timerID); stopListening();
-  g("dtime").textContent = `Session complete · ${fmt(elapsed)}`;
-  g("dmeta").innerHTML = `Practice session with <strong>${active.name}</strong> · ${fmt(elapsed)}`;
-  const tr = g("transcript");
-  tr.innerHTML = log.length === 0 ? "No activity" : "";
-  log.forEach(m => {
-    const isu = m.role==="user";
-    const r = document.createElement("div"); r.className="trow";
-    r.innerHTML = `
-      <div class="av av-sm" style="background:${isu?"var(--red)":"var(--red-light)"};border:${isu?"none":"1.5px solid var(--red-mid)"};color:${isu?"#fff":"var(--red)"}">${isu?"YOU":active.avatar}</div>
-      <div style="flex:1"><div class="tlabel">${isu?"You":active.name}</div><div class="tbbl">${m.text}</div></div>`;
-    tr.appendChild(r);
-  });
-  showPage("debrief");
-  if(log.length > 0) getFeedback();
-}
-
+ 
+// ════════════════════════════════════════════════════════
+// VOICE
+// ════════════════════════════════════════════════════════
 function startListening() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
-  recog = new SR(); recog.continuous=false; recog.interimResults=true;
-  let final="";
+  if (!SR) { g("micerr").style.display = "block"; return; }
+  recog = new SR(); recog.continuous = false; recog.interimResults = true;
+  let final = "";
   recog.onresult = e => {
-    final = Array.from(e.results).map(r=>r[0].transcript).join("");
-    g("livetx").style.display="block"; g("livetx").textContent = final;
+    final = Array.from(e.results).map(r => r[0].transcript).join("");
+    g("livetx").style.display = "block"; g("livetx").textContent = final;
   };
   recog.onend = () => {
-    isListening=false; g("livetx").style.display="none";
+    isListening = false; g("livetx").style.display = "none";
     if (final.trim()) handleMsg(final.trim());
     micState("idle");
   };
-  recog.start(); isListening=true; micState("live");
+  recog.onerror = () => { g("micerr").style.display = "block"; setMode("text"); };
+  recog.start(); isListening = true; micState("live"); updateStat();
 }
-
-function stopListening() { recog?.stop(); isListening=false; }
-
+ 
+function stopListening() { recog?.stop(); isListening = false; }
+ 
 function setMode(m) {
   mode = m;
-  g("vinput").style.display = m==="voice" ? "flex" : "none";
-  g("tinput").style.display = m==="text"  ? "flex" : "none";
-  g("btn-voice").className  = `mode-btn${m==="voice"?" on":""}`;
-  g("btn-text").className   = `mode-btn${m==="text"?" on":""}`;
-  if (m==="text") stopListening();
+  g("vinput").style.display = m === "voice" ? "flex" : "none";
+  g("tinput").style.display = m === "text"  ? "flex" : "none";
+  g("btn-voice").className  = `mode-btn${m === "voice" ? " on" : ""}`;
+  g("btn-text").className   = `mode-btn${m === "text"  ? " on" : ""}`;
+  if (m === "text") stopListening();
 }
-
+ 
+// ════════════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════════════
+function openModal() {
+  ["cp-name","cp-label","cp-company","cp-desc","cp-tags"].forEach(id => g(id).value = "");
+  g("cp-difficulty").value = "Medium";
+  g("cp-err").style.display = "none";
+  g("persona-modal").classList.add("open");
+  setTimeout(() => g("cp-name").focus(), 80);
+}
+ 
+function closeModal() { g("persona-modal").classList.remove("open"); }
+ 
+function saveCustomPersona() {
+  const name    = g("cp-name").value.trim();
+  const label   = g("cp-label").value.trim();
+  const desc    = g("cp-desc").value.trim();
+  const company = g("cp-company").value.trim();
+  const tagsRaw = g("cp-tags").value.trim();
+  const err     = g("cp-err");
+ 
+  if (!name || !label || !desc) { err.textContent = "Please fill in Name, Role, and Description."; err.style.display = "block"; return; }
+  err.style.display = "none";
+ 
+  const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2) || name.slice(0,2).toUpperCase();
+  const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean) : [];
+  const id = "custom_" + Date.now();
+  const persona = {
+    id, name, label, company,
+    avatar: initials,
+    difficulty: g("cp-difficulty").value,
+    desc, concerns: tags,
+    systemDesc: desc,
+    custom: true
+  };
+ 
+  const list = loadCustom(); list.push(persona); saveCustom(list);
+  closeModal(); renderGrid(); pickPersona(persona);
+}
+ 
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
   renderGrid();
+ 
   g("start-btn").onclick   = startSession;
   g("end-btn").onclick     = endSession;
   g("micbtn").onclick      = () => isListening ? stopListening() : startListening();
   g("btn-voice").onclick   = () => setMode("voice");
   g("btn-text").onclick    = () => setMode("text");
-  g("new-btn").onclick     = () => location.reload();
+  g("new-btn").onclick     = () => { showPage("lobby"); selected = null; renderGrid(); g("start-btn").disabled = true; g("start-btn").textContent = "Select a customer to begin"; g("sel-lbl").style.display = "none"; };
   g("restart-btn").onclick = startSession;
-
-  // Filter tabs
+ 
   document.querySelectorAll(".ftab").forEach(b => b.onclick = () => {
     document.querySelectorAll(".ftab").forEach(x => x.classList.remove("on"));
     b.classList.add("on"); filter = b.dataset.f; renderGrid();
   });
-
-  // Modal wiring
+ 
   g("modal-close-btn").onclick  = closeModal;
   g("modal-cancel-btn").onclick = closeModal;
   g("modal-save-btn").onclick   = saveCustomPersona;
-  g("persona-modal").onclick = e => { if (e.target === g("persona-modal")) closeModal(); };
-  document.addEventListener("keydown", e => { if (e.key==="Escape") closeModal(); });
-  
-  const ta=g("txt"), sb=g("send-btn");
-  ta.oninput = () => sb.disabled = !ta.value.trim();
-  ta.onkeydown = e => { if (e.key==="Enter"&&!e.shiftKey) { e.preventDefault(); if(ta.value.trim()){handleMsg(ta.value.trim());ta.value="";sb.disabled=true;} }};
-  sb.onclick = () => { if(ta.value.trim()){handleMsg(ta.value.trim());ta.value="";sb.disabled=true;} };
+  g("persona-modal").onclick    = e => { if (e.target === g("persona-modal")) closeModal(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+ 
+  const ta = g("txt"), sb = g("send-btn");
+  ta.oninput   = () => sb.disabled = !ta.value.trim();
+  ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (ta.value.trim()) { handleMsg(ta.value.trim()); ta.value = ""; sb.disabled = true; } } };
+  sb.onclick   = () => { if (ta.value.trim()) { handleMsg(ta.value.trim()); ta.value = ""; sb.disabled = true; } };
 });
 </script>
 </body>
